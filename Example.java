@@ -41,7 +41,6 @@ public class Example {
     params.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
     params.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
     params.setFileNameInZip("test.txt");
-    params.setSourceExternalStream(true);
 
     ZipOutputStream out = new ZipOutputStream(new FileOutputStream("example.zip"));
     out.putNextEntry(params);

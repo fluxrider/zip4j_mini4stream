@@ -66,10 +66,6 @@ public class CipherOutputStream extends BaseOutputStream {
 	}
 	
 	public void putNextEntry(ZipParameters zipParameters) throws ZipException {
-		if (!zipParameters.isSourceExternalStream()) {
-			throw new ZipException("input stream not declared as such");
-		}
-		
 		try {
 			this.zipParameters = (ZipParameters)zipParameters.clone();
 			
@@ -269,11 +265,9 @@ public class CipherOutputStream extends BaseOutputStream {
 		fileHeader.setCompressedSize(bytesWrittenForThisFile);
 		localFileHeader.setCompressedSize(bytesWrittenForThisFile);
 		
-		if (zipParameters.isSourceExternalStream()) {
-			fileHeader.setUncompressedSize(totalBytesRead);
-			if (localFileHeader.getUncompressedSize() != totalBytesRead) {
-				localFileHeader.setUncompressedSize(totalBytesRead);
-			}
+		fileHeader.setUncompressedSize(totalBytesRead);
+		if (localFileHeader.getUncompressedSize() != totalBytesRead) {
+			localFileHeader.setUncompressedSize(totalBytesRead);
 		}
 		
 		long crc32 = crc.getValue();
@@ -333,13 +327,11 @@ public class CipherOutputStream extends BaseOutputStream {
 			fileHeader.setEncryptionMethod(zipParameters.getEncryptionMethod());
 		}
 		String fileName = null;
-		if (zipParameters.isSourceExternalStream()) {
-			fileHeader.setLastModFileTime((int) Zip4jUtil.javaToDosTime(System.currentTimeMillis()));
-			if (!Zip4jUtil.isStringNotNullAndNotEmpty(zipParameters.getFileNameInZip())) {
-				throw new ZipException("fileNameInZip is null or empty");
-			}
-			fileName = zipParameters.getFileNameInZip();
+		fileHeader.setLastModFileTime((int) Zip4jUtil.javaToDosTime(System.currentTimeMillis()));
+		if (!Zip4jUtil.isStringNotNullAndNotEmpty(zipParameters.getFileNameInZip())) {
+			throw new ZipException("fileNameInZip is null or empty");
 		}
+		fileName = zipParameters.getFileNameInZip();
 		
 		if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
 			throw new ZipException("fileName is null or empty. unable to create file header");

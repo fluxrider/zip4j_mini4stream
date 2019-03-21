@@ -184,12 +184,4 @@ public class ZipParameters implements Cloneable {
 		this.fileNameInZip = fileNameInZip;
 	}
 
-	public boolean isSourceExternalStream() {
-		return isSourceExternalStream;
-	}
-
-	public void setSourceExternalStream(boolean isSourceExternalStream) {
-		this.isSourceExternalStream = isSourceExternalStream;
-	}
-	
 }
