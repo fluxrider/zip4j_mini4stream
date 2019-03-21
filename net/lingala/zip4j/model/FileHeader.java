@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.progress.ProgressMonitor;
-import net.lingala.zip4j.unzip.Unzip;
 import net.lingala.zip4j.util.Zip4jUtil;
 
 public class FileHeader {
@@ -239,59 +238,6 @@ public class FileHeader {
 		this.isDirectory = isDirectory;
 	}
 	
-	/**
-	 * Extracts file to the specified directory
-	 * @param zipModel
-	 * @param outPath
-	 * @throws ZipException
-	 */
-	public void extractFile(ZipModel zipModel, String outPath, 
-			ProgressMonitor progressMonitor, boolean runInThread) throws ZipException {
-		extractFile(zipModel, outPath, null, progressMonitor, runInThread);
-	}
-	
-	/**
-	 * Extracts file to the specified directory using any 
-	 * user defined parameters in UnzipParameters
-	 * @param zipModel
-	 * @param outPath
-	 * @param unzipParameters
-	 * @throws ZipException
-	 */
-	public void extractFile(ZipModel zipModel, String outPath, 
-			UnzipParameters unzipParameters, ProgressMonitor progressMonitor, boolean runInThread) throws ZipException {
-		extractFile(zipModel, outPath, unzipParameters, null, progressMonitor, runInThread);
-	}
-	
-	/**
-	 * Extracts file to the specified directory using any 
-	 * user defined parameters in UnzipParameters. Output file name
-	 * will be overwritten with the value in newFileName. If this 
-	 * parameter is null, then file name will be the same as in 
-	 * FileHeader.getFileName
-	 * @param zipModel
-	 * @param outPath
-	 * @param unzipParameters
-	 * @throws ZipException
-	 */
-	public void extractFile(ZipModel zipModel, String outPath, 
-			UnzipParameters unzipParameters, String newFileName, 
-			ProgressMonitor progressMonitor, boolean runInThread) throws ZipException {
-		if (zipModel == null) {
-			throw new ZipException("input zipModel is null");
-		}
-		
-		if (!Zip4jUtil.checkOutputFolder(outPath)) {
-			throw new ZipException("Invalid output path");
-		}
-		
-		if (this == null) {
-			throw new ZipException("invalid file header");
-		}
-		Unzip unzip = new Unzip(zipModel);
-		unzip.extractFile(this, outPath, unzipParameters, newFileName, progressMonitor, runInThread);
-	}
-
 	public boolean isEncrypted() {
 		return isEncrypted;
 	}
