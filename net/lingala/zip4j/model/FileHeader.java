@@ -62,8 +62,6 @@ public class FileHeader {
 	
 	private String fileComment;
 	
-	private boolean isDirectory;
-	
 	private boolean isEncrypted;
 	
 	private int encryptionMethod;
@@ -230,14 +228,6 @@ public class FileHeader {
 		this.fileComment = fileComment;
 	}
 
-	public boolean isDirectory() {
-		return isDirectory;
-	}
-
-	public void setDirectory(boolean isDirectory) {
-		this.isDirectory = isDirectory;
-	}
-	
 	public boolean isEncrypted() {
 		return isEncrypted;
 	}

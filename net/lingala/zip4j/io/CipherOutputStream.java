@@ -352,15 +352,6 @@ public class CipherOutputStream extends BaseOutputStream {
 			fileHeader.setDiskNumberStart(0);
 		}
 		
-		int fileAttrs = 0;
-		byte[] externalFileAttrs = {(byte)fileAttrs, 0, 0, 0};
-		fileHeader.setExternalFileAttr(externalFileAttrs);
-		
-		fileHeader.setDirectory(fileName.endsWith("/") || fileName.endsWith("\\"));
-		if (fileHeader.isDirectory()) {
-			fileHeader.setCompressedSize(0);
-			fileHeader.setUncompressedSize(0);
-		}
 		if (zipParameters.isEncryptFiles() && 
 				zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
 			fileHeader.setCrc32(zipParameters.getSourceFileCRC());
@@ -398,40 +389,6 @@ public class CipherOutputStream extends BaseOutputStream {
 		localFileHeader.setCrc32(fileHeader.getCrc32());
 		localFileHeader.setCompressedSize(fileHeader.getCompressedSize());
 		localFileHeader.setGeneralPurposeFlag((byte[])fileHeader.getGeneralPurposeFlag().clone());
-	}
-	
-	/**
-	 * Checks the file attributes and returns an integer
-	 * @param file
-	 * @return
-	 * @throws ZipException
-	 */
-	private int getFileAttributes(File file) throws ZipException {
-		if (file == null) {
-			throw new ZipException("input file is null, cannot get file attributes");
-		}
-		
-		if (!file.exists()) {
-			return 0;
-		}
-		
-		if (file.isDirectory()) {
-			if (file.isHidden()) {
-				return InternalZipConstants.FOLDER_MODE_HIDDEN;
-			} else {
-				return InternalZipConstants.FOLDER_MODE_NONE;
-			}
-		} else {
-			if (!file.canWrite() && file.isHidden()) {
-				return InternalZipConstants.FILE_MODE_READ_ONLY_HIDDEN;
-			} else if (!file.canWrite()) {
-				return InternalZipConstants.FILE_MODE_READ_ONLY;
-			} else if (file.isHidden()) {
-				return InternalZipConstants.FILE_MODE_HIDDEN;
-			} else {
-				return InternalZipConstants.FILE_MODE_NONE;
-			}
-		}
 	}
 	
 	private int[] generateGeneralPurposeBitArray(boolean isEncrpyted, int compressionMethod) {
