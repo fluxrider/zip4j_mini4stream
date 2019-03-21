@@ -43,9 +43,11 @@ public class Example {
     params.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
     params.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
     // TODO try MAXIMUM/ULTRA
+    params.setFileNameInZip("test.txt");
+    params.setSourceExternalStream(true);
 
     ZipOutputStream out = new ZipOutputStream(new FileOutputStream("example.zip"));
-    out.putNextEntry(new File("LICENSE"), params); // TMP the point is that I won't need a file no more
+    out.putNextEntry(params);
     out.write("Hello".getBytes());
     out.closeEntry();
     out.finish();
