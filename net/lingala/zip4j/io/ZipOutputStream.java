@@ -33,18 +33,19 @@ public class ZipOutputStream extends CipherOutputStream {
 	protected Deflater deflater;
 	private boolean firstBytesRead;
 	
-	public ZipOutputStream(OutputStream outputStream) {
-		this(outputStream, null);
+	public ZipOutputStream(OutputStream outputStream, ZipParameters zipParameters) throws ZipException {
+		this(outputStream, null, zipParameters);
 	}
 
-	public ZipOutputStream(OutputStream outputStream, ZipModel zipModel) {
-		super(outputStream, zipModel);
+	public ZipOutputStream(OutputStream out, ZipModel model, ZipParameters params) throws ZipException {
+		super(out, model);
 		deflater = new Deflater();
 		buff = new byte[InternalZipConstants.BUFF_SIZE];
 		firstBytesRead = false;
+		putNextEntry(params);
 	}
 	
-	public void putNextEntry(ZipParameters zipParameters)
+	protected void putNextEntry(ZipParameters zipParameters)
 			throws ZipException {
 		super.putNextEntry(zipParameters);
 		if (zipParameters.getCompressionMethod() == Zip4jConstants.COMP_DEFLATE) {
@@ -52,8 +53,7 @@ public class ZipOutputStream extends CipherOutputStream {
 			if ((zipParameters.getCompressionLevel() < 0 || zipParameters
 					.getCompressionLevel() > 9)
 					&& zipParameters.getCompressionLevel() != -1) {
-				throw new ZipException(
-						"invalid compression level for deflater. compression level should be in the range of 0-9");
+				throw new ZipException("invalid compression level for deflater, range is [0,9].");
 			}
 			deflater.setLevel(zipParameters.getCompressionLevel());
 		}
@@ -86,13 +86,13 @@ public class ZipOutputStream extends CipherOutputStream {
 			super.write(buf, off, len);
 		} else {
 			deflater.setInput(buf, off, len);
-			 while (!deflater.needsInput()) {
-				 deflate();
-             }
+			while (!deflater.needsInput()) {
+				deflate();
+			}
 		}		
 	}
 	
-	public void closeEntry() throws IOException, ZipException {
+	protected void closeEntry() throws IOException, ZipException {
 		if (zipParameters.getCompressionMethod() == Zip4jConstants.COMP_DEFLATE) {
 			if (!deflater.finished()) {
 				deflater.finish();
@@ -104,8 +104,5 @@ public class ZipOutputStream extends CipherOutputStream {
 		}
 		super.closeEntry();
 	}
-	
-	public void finish() throws IOException, ZipException {
-		super.finish();
-	}
+
 }

@@ -39,7 +39,7 @@ import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 
-public class CipherOutputStream extends OutputStream {
+public abstract class CipherOutputStream extends OutputStream {
 	
 	protected OutputStream outputStream;
 	protected FileHeader fileHeader;
@@ -65,7 +65,7 @@ public class CipherOutputStream extends OutputStream {
 		this.totalBytesRead = 0;
 	}
 	
-	public void putNextEntry(ZipParameters zipParameters) throws ZipException {
+	protected void putNextEntry(ZipParameters zipParameters) throws ZipException {
 		try {
 			this.zipParameters = (ZipParameters)zipParameters.clone();
 			
@@ -221,7 +221,7 @@ public class CipherOutputStream extends OutputStream {
 		bytesWrittenForThisFile += len;
 	}
 	
-	public void closeEntry() throws IOException, ZipException {
+	protected void closeEntry() throws IOException, ZipException {
 		
 		if (this.pendingBufferLength != 0) {
 			encryptAndWrite(pendingBuffer, 0, pendingBufferLength);
@@ -274,7 +274,7 @@ public class CipherOutputStream extends OutputStream {
 		totalBytesRead = 0;
 	}
 	
-	public void finish() throws IOException, ZipException {
+	private void finish() throws IOException, ZipException {
 		zipModel.getEndCentralDirRecord().setOffsetOfStartOfCentralDir(totalBytesWritten);
 		
 		HeaderWriter headerWriter = new HeaderWriter();
@@ -282,6 +282,12 @@ public class CipherOutputStream extends OutputStream {
 	}
 	
 	public void close() throws IOException {
+		try {
+			closeEntry();
+			finish();
+		} catch(ZipException e) {
+			throw new RuntimeException(e);
+		}
 		if (outputStream != null)
 			outputStream.close();
 	}

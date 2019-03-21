@@ -42,11 +42,9 @@ public class Example {
     params.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
     params.setFileNameInZip("test.txt");
 
-    ZipOutputStream out = new ZipOutputStream(new FileOutputStream("example.zip"));
-    out.putNextEntry(params);
+    ZipOutputStream out = new ZipOutputStream(new FileOutputStream("example.zip"), params);
     out.write("Hello".getBytes());
-    out.closeEntry();
-    out.finish();
+    out.close();
   }
 
 }
