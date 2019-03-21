@@ -19,14 +19,8 @@ package net.lingala.zip4j.util;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.List;
 import java.util.TimeZone;
-
-import net.lingala.zip4j.model.FileHeader;
-import net.lingala.zip4j.model.ZipModel;
 
 public class Zip4jUtil {
 	
@@ -272,9 +266,8 @@ public class Zip4jUtil {
 			} catch (UnsupportedEncodingException e) {
 				return new String(data);
 			}
-		} else {
-			return getCp850EncodedString(data);
 		}
+		return getCp850EncodedString(data);
 	}
 	
 	/**
@@ -389,27 +382,6 @@ public class Zip4jUtil {
 		
 		return byteBuffer.limit();
 	}
-	
-	/**
-	 * Checks if the input charset is supported
-	 * @param charset
-	 * @return boolean
-	 */
-	public static boolean isSupportedCharset(String charset) {
-		if (!isStringNotNullAndNotEmpty(charset)) {
-			throw new RuntimeException("charset is null or empty, cannot check if it is supported");
-		}
-		
-		try {
-			new String("a".getBytes(), charset);
-			return true;
-		} catch (UnsupportedEncodingException e) {
-			return false;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
 	
 	public static String getRelativeFileName(String file, String rootFolderInZip, String rootFolderPath) {
 		if (!Zip4jUtil.isStringNotNullAndNotEmpty(file)) {

@@ -16,7 +16,6 @@
 
 package net.lingala.zip4j.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -163,7 +162,7 @@ public class HeaderWriter {
 		}
 	}
 	
-	public int writeExtendedLocalHeader(LocalFileHeader localFileHeader, 
+	public static int writeExtendedLocalHeader(LocalFileHeader localFileHeader, 
 			OutputStream outputStream) throws IOException {
 		if (localFileHeader == null || outputStream == null) {
 			throw new RuntimeException("input parameters is null, cannot write extended local header");
@@ -294,7 +293,7 @@ public class HeaderWriter {
 	 * @param outputStream
 	 * @param buff
 	 */
-	private void writeZipHeaderBytes(ZipModel zipModel, OutputStream outputStream, byte[] buff) {
+	private static void writeZipHeaderBytes(ZipModel zipModel, OutputStream outputStream, byte[] buff) {
 		if (buff == null) {
 			throw new RuntimeException("invalid buff to write as zip headers");
 		}
@@ -311,7 +310,7 @@ public class HeaderWriter {
 	 * @param zipModel
 	 * @param outputStream
 	 */
-	private void processHeaderData(ZipModel zipModel, OutputStream outputStream) {
+	private static void processHeaderData(ZipModel zipModel, OutputStream outputStream) {
 		int currSplitFileCounter = 0;
 		
 		if (zipModel.isZip64Format()) {
@@ -568,7 +567,7 @@ public class HeaderWriter {
 		}
 	}
 	
-	private void writeZip64EndOfCentralDirectoryRecord(ZipModel zipModel, 
+	private static void writeZip64EndOfCentralDirectoryRecord(ZipModel zipModel, 
 			OutputStream outputStream, int sizeOfCentralDir, 
 			long offsetCentralDir, List<String> headerBytesList) {
 		if (zipModel == null || outputStream == null) {
@@ -587,7 +586,7 @@ public class HeaderWriter {
 			copyByteArrayToArrayList(intByte, headerBytesList);
 			
 			//size of zip64 end of central directory record
-			Raw.writeLongLittleEndian(longByte, 0, (long)44);
+			Raw.writeLongLittleEndian(longByte, 0, 44);
 			copyByteArrayToArrayList(longByte, headerBytesList);
 			
 			//version made by
@@ -622,14 +621,13 @@ public class HeaderWriter {
 					zipModel.getCentralDirectory().getFileHeaders() == null) {
 				throw new RuntimeException("invalid central directory/file headers, " +
 						"cannot write end of central directory record");
+			}
+			numEntries = zipModel.getCentralDirectory().getFileHeaders().size();
+			if (zipModel.isSplitArchive()) {
+				countNumberOfFileHeaderEntriesOnDisk(zipModel.getCentralDirectory().getFileHeaders(), 
+						zipModel.getEndCentralDirRecord().getNoOfThisDisk());
 			} else {
-				numEntries = zipModel.getCentralDirectory().getFileHeaders().size();
-				if (zipModel.isSplitArchive()) {
-					countNumberOfFileHeaderEntriesOnDisk(zipModel.getCentralDirectory().getFileHeaders(), 
-							zipModel.getEndCentralDirRecord().getNoOfThisDisk());
-				} else {
-					numEntriesOnThisDisk = numEntries;
-				}
+				numEntriesOnThisDisk = numEntries;
 			}
 			Raw.writeLongLittleEndian(longByte, 0, numEntriesOnThisDisk);
 			copyByteArrayToArrayList(longByte, headerBytesList);
@@ -651,7 +649,7 @@ public class HeaderWriter {
 		}
 	}
 	
-	private void writeZip64EndOfCentralDirectoryLocator(ZipModel zipModel, 
+	private static void writeZip64EndOfCentralDirectoryLocator(ZipModel zipModel, 
 			OutputStream outputStream, List<String> headerBytesList) {
 		if (zipModel == null || outputStream == null) {
 			throw new RuntimeException("zip model or output stream is null, cannot write zip64 end of central directory locator");
@@ -682,7 +680,7 @@ public class HeaderWriter {
 		}
 	}
 	
-	private void writeEndOfCentralDirectoryRecord(ZipModel zipModel, 
+	private static void writeEndOfCentralDirectoryRecord(ZipModel zipModel, 
 			OutputStream outputStream, 
 			int sizeOfCentralDir, 
 			long offsetCentralDir,
@@ -716,15 +714,15 @@ public class HeaderWriter {
 					zipModel.getCentralDirectory().getFileHeaders() == null) {
 				throw new RuntimeException("invalid central directory/file headers, " +
 						"cannot write end of central directory record");
+			} 
+			numEntries = zipModel.getCentralDirectory().getFileHeaders().size();
+			if (zipModel.isSplitArchive()) {
+				numEntriesOnThisDisk = countNumberOfFileHeaderEntriesOnDisk(zipModel.getCentralDirectory().getFileHeaders(), 
+						zipModel.getEndCentralDirRecord().getNoOfThisDisk());
 			} else {
-				numEntries = zipModel.getCentralDirectory().getFileHeaders().size();
-				if (zipModel.isSplitArchive()) {
-					numEntriesOnThisDisk = countNumberOfFileHeaderEntriesOnDisk(zipModel.getCentralDirectory().getFileHeaders(), 
-							zipModel.getEndCentralDirRecord().getNoOfThisDisk());
-				} else {
-					numEntriesOnThisDisk = numEntries;
-				}
+				numEntriesOnThisDisk = numEntries;
 			}
+			
 			Raw.writeShortLittleEndian(shortByte, 0, (short)numEntriesOnThisDisk);
 			copyByteArrayToArrayList(shortByte, headrBytesList);
 			
@@ -766,7 +764,7 @@ public class HeaderWriter {
 		}
 	}
 	
-	private void copyByteArrayToArrayList(byte[] byteArray, List<String> arrayList) {
+	private static void copyByteArrayToArrayList(byte[] byteArray, List<String> arrayList) {
 		if (arrayList == null || byteArray == null) {
 			throw new RuntimeException("one of the input parameters is null, cannot copy byte array to array list");
 		}
@@ -776,7 +774,7 @@ public class HeaderWriter {
 		}
 	}
 	
-	private byte[] byteArrayListToByteArray(List<String> arrayList) {
+	private static byte[] byteArrayListToByteArray(List<String> arrayList) {
 		if (arrayList == null) {
 			throw new RuntimeException("input byte array list is null, cannot conver to byte array");
 		}
@@ -794,7 +792,7 @@ public class HeaderWriter {
 		return retBytes;
 	}
 	
-	private int countNumberOfFileHeaderEntriesOnDisk(ArrayList<FileHeader> fileHeaders, 
+	private static int countNumberOfFileHeaderEntriesOnDisk(ArrayList<FileHeader> fileHeaders, 
 			int numOfDisk) {
 		if (fileHeaders == null) {
 			throw new RuntimeException("file headers are null, cannot calculate number of entries on this disk");

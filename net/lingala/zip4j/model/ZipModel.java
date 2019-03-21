@@ -16,8 +16,6 @@
 
 package net.lingala.zip4j.model;
 
-import java.util.List;
-
 public class ZipModel implements Cloneable {
 	
 	private ArchiveExtraDataRecord archiveExtraDataRecord;

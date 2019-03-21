@@ -37,7 +37,6 @@ public class ZipParameters implements Cloneable {
 	private int sourceFileCRC;
 	private String defaultFolderPath;
 	private String fileNameInZip;
-	private boolean isSourceExternalStream;
 	
 	public ZipParameters() {
 		compressionMethod = Zip4jConstants.COMP_DEFLATE;

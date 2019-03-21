@@ -16,7 +16,6 @@
 
 package net.lingala.zip4j;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -270,8 +269,7 @@ public class ZipOutputStream extends OutputStream {
 		
 		zipModel.getCentralDirectory().getFileHeaders().add(fileHeader);
 		
-		HeaderWriter headerWriter = new HeaderWriter();
-		totalBytesWritten += headerWriter.writeExtendedLocalHeader(localFileHeader, outputStream);
+		totalBytesWritten += HeaderWriter.writeExtendedLocalHeader(localFileHeader, outputStream);
 		
 		crc.reset();
 		bytesWrittenForThisFile = 0;
@@ -279,7 +277,7 @@ public class ZipOutputStream extends OutputStream {
 		totalBytesRead = 0;
 	}
 	
-	private void finish() throws IOException {
+	private void finish() {
 		zipModel.getEndCentralDirRecord().setOffsetOfStartOfCentralDir(totalBytesWritten);
 		
 		HeaderWriter headerWriter = new HeaderWriter();
@@ -364,8 +362,8 @@ public class ZipOutputStream extends OutputStream {
 		localFileHeader.setCompressedSize(fileHeader.getCompressedSize());
 		localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().clone());
 	}
-	
-	private int[] generateGeneralPurposeBitArray(boolean isEncrpyted, int compressionMethod) {
+
+	private static int[] generateGeneralPurposeBitArray(boolean isEncrpyted, int compressionMethod) {
 		
 		int[] generalPurposeBits = new int[8];
 		if (isEncrpyted) {
@@ -386,7 +384,7 @@ public class ZipOutputStream extends OutputStream {
 		return generalPurposeBits;
 	}
 	
-	private AESExtraDataRecord generateAESExtraDataRecord(ZipParameters parameters) {
+	private static AESExtraDataRecord generateAESExtraDataRecord(ZipParameters parameters) {
 		
 		if (parameters == null) {
 			throw new RuntimeException("parameters null, cannot generate AES Extra Data record");

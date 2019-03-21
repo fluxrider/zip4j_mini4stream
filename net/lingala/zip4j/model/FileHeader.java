@@ -16,8 +16,6 @@
 
 package net.lingala.zip4j.model;
 
-import net.lingala.zip4j.util.Zip4jUtil;
-
 public class FileHeader {
 	
 	private int signature;

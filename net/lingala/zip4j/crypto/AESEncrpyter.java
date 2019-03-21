@@ -24,12 +24,10 @@ import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Parameters;
 import net.lingala.zip4j.crypto.AESEngine;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 public class AESEncrpyter implements IEncrypter {
 	
 	private char[] password;
-	private int keyStrength;
 	private AESEngine aesEngine;
 	private MacBasedPRF mac;
 	
@@ -57,7 +55,6 @@ public class AESEncrpyter implements IEncrypter {
 		}
 		
 		this.password = password;
-		this.keyStrength = keyStrength;
 		this.finished = false;
 		counterBlock = new byte[InternalZipConstants.AES_BLOCK_SIZE];
 		iv = new byte[InternalZipConstants.AES_BLOCK_SIZE];

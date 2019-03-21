@@ -185,11 +185,11 @@ public class AESEngine {
 
     }
     
-    private int shift(int r, int shift) {
+    private static int shift(int r, int shift) {
         return (r >>> shift) | (r << -shift);
     }
     
-    private int subWord(int x) {
+    private static int subWord(int x) {
         return (S[x&255]&255 | ((S[(x>>8)&255]&255)<<8) | ((S[(x>>16)&255]&255)<<16) | S[(x>>24)&255]<<24);
     }
     
