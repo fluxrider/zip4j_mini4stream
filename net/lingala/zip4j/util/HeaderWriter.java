@@ -14,7 +14,7 @@
 * limitations under the License. 
 */
 
-package net.lingala.zip4j;
+package net.lingala.zip4j.util;
 
 import java.io.File;
 import java.io.IOException;

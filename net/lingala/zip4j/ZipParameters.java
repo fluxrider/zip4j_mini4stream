@@ -14,7 +14,7 @@
 * limitations under the License. 
 */
 
-package net.lingala.zip4j.model;
+package net.lingala.zip4j;
 
 import java.util.TimeZone;
 
