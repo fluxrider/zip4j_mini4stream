@@ -25,7 +25,6 @@ import java.util.zip.CRC32;
 import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.crypto.AESEncrpyter;
 import net.lingala.zip4j.crypto.IEncrypter;
-import net.lingala.zip4j.crypto.StandardEncrypter;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.EndCentralDirRecord;
@@ -98,19 +97,12 @@ public abstract class CipherOutputStream extends OutputStream {
 			if (this.zipParameters.isEncryptFiles()) {
 				initEncrypter();
 				if (encrypter != null) {
-					if (zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
-						byte[] headerBytes = ((StandardEncrypter)encrypter).getHeaderBytes();
-						outputStream.write(headerBytes);
-						totalBytesWritten += headerBytes.length;
-						bytesWrittenForThisFile += headerBytes.length;
-					} else if (zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
-						byte[] saltBytes = ((AESEncrpyter)encrypter).getSaltBytes();
-						byte[] passwordVerifier = ((AESEncrpyter)encrypter).getDerivedPasswordVerifier();
-						outputStream.write(saltBytes);
-						outputStream.write(passwordVerifier);
-						totalBytesWritten += saltBytes.length + passwordVerifier.length;
-						bytesWrittenForThisFile += saltBytes.length + passwordVerifier.length;
-					}
+					byte[] saltBytes = ((AESEncrpyter)encrypter).getSaltBytes();
+					byte[] passwordVerifier = ((AESEncrpyter)encrypter).getDerivedPasswordVerifier();
+					outputStream.write(saltBytes);
+					outputStream.write(passwordVerifier);
+					totalBytesWritten += saltBytes.length + passwordVerifier.length;
+					bytesWrittenForThisFile += saltBytes.length + passwordVerifier.length;
 				}
 			} 
 			
@@ -128,17 +120,7 @@ public abstract class CipherOutputStream extends OutputStream {
 			return;
 		}
 		
-		switch (zipParameters.getEncryptionMethod()) {
-		case Zip4jConstants.ENC_METHOD_STANDARD:
-			// Since we do not know the crc here, we use the modification time for encrypting.
-			encrypter = new StandardEncrypter(zipParameters.getPassword(), (localFileHeader.getLastModFileTime() & 0x0000ffff) << 16);
-			break;
-		case Zip4jConstants.ENC_METHOD_AES:
-			encrypter = new AESEncrpyter(zipParameters.getPassword(), zipParameters.getAesKeyStrength());
-			break;
-		default:
-			throw new RuntimeException("invalid encprytion method");
-		}
+		encrypter = new AESEncrpyter(zipParameters.getPassword(), zipParameters.getAesKeyStrength());
 	}
 	
 	private void initZipModel(ZipModel zipModel) {
@@ -175,8 +157,7 @@ public abstract class CipherOutputStream extends OutputStream {
 	public void write(byte[] b, int off, int len) throws IOException {
 		if (len == 0) return;
 		
-		if (zipParameters.isEncryptFiles() && 
-				zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+		if (zipParameters.isEncryptFiles()) {
 			if (pendingBufferLength != 0) {
 				if (len >= (InternalZipConstants.AES_BLOCK_SIZE - pendingBufferLength)) {
 					System.arraycopy(b, off, pendingBuffer, pendingBufferLength,
@@ -218,8 +199,7 @@ public abstract class CipherOutputStream extends OutputStream {
 			pendingBufferLength = 0;
 		}
 		
-		if (this.zipParameters.isEncryptFiles() && 
-				this.zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+		if (this.zipParameters.isEncryptFiles()) {
 			if (encrypter instanceof AESEncrpyter) {
 				outputStream.write(((AESEncrpyter)encrypter).getFinalMac());
 				bytesWrittenForThisFile += 10;
@@ -236,18 +216,11 @@ public abstract class CipherOutputStream extends OutputStream {
 			localFileHeader.setUncompressedSize(totalBytesRead);
 		}
 		
-		long crc32 = crc.getValue();
-		if (fileHeader.isEncrypted()) {
-			if (fileHeader.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
-				crc32 = 0;
-			}
-		}
-		
-		if (zipParameters.isEncryptFiles() && 
-				zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+		if (zipParameters.isEncryptFiles()) {
 			fileHeader.setCrc32(0);
 			localFileHeader.setCrc32(0);
 		} else {
+  		long crc32 = crc.getValue();
 			fileHeader.setCrc32(crc32);
 			localFileHeader.setCrc32(crc32);
 		}
@@ -282,8 +255,7 @@ public abstract class CipherOutputStream extends OutputStream {
 		fileHeader.setSignature((int)InternalZipConstants.CENSIG);
 		fileHeader.setVersionMadeBy(20);
 		fileHeader.setVersionNeededToExtract(20);
-		if (zipParameters.isEncryptFiles() && 
-				zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_AES) {
+		if (zipParameters.isEncryptFiles()) {
 			fileHeader.setCompressionMethod(Zip4jConstants.ENC_METHOD_AES);
 			fileHeader.setAesExtraDataRecord(generateAESExtraDataRecord(zipParameters));
 		} else {
@@ -315,10 +287,6 @@ public abstract class CipherOutputStream extends OutputStream {
 		
 		fileHeader.setDiskNumberStart(0);
 		
-		if (zipParameters.isEncryptFiles() && 
-				zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
-			fileHeader.setCrc32(zipParameters.getSourceFileCRC());
-		}
 		byte[] shortByte = new byte[2]; 
 		shortByte[0] = Raw.bitArrayToByte(generateGeneralPurposeBitArray(
 				fileHeader.isEncrypted(), zipParameters.getCompressionMethod()));
@@ -389,13 +357,7 @@ public abstract class CipherOutputStream extends OutputStream {
 		// only MAC is stored and as per the specification, if version number is 2, then MAC is read
 		// and CRC is ignored
 		aesDataRecord.setVersionNumber(2); 
-		if (parameters.getAesKeyStrength() == Zip4jConstants.AES_STRENGTH_128) {
-			aesDataRecord.setAesStrength(Zip4jConstants.AES_STRENGTH_128);
-		} else if (parameters.getAesKeyStrength() == Zip4jConstants.AES_STRENGTH_256) {
-			aesDataRecord.setAesStrength(Zip4jConstants.AES_STRENGTH_256);
-		} else {
-			throw new RuntimeException("invalid AES key strength");
-		}
+		aesDataRecord.setAesStrength(Zip4jConstants.AES_STRENGTH_256);
 		aesDataRecord.setCompressionMethod(parameters.getCompressionMethod());
 		
 		return aesDataRecord;

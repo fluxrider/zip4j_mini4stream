@@ -35,8 +35,6 @@ public class Example {
   public static void main(String[] args) throws Exception {
     ZipParameters params = new ZipParameters();
     params.setEncryptFiles(true);
-    params.setEncryptionMethod(Zip4jConstants.ENC_METHOD_AES);
-    params.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
     params.setPassword("my_password_goes_here");
     params.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
     params.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);

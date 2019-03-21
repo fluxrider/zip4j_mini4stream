@@ -46,12 +46,8 @@ public interface Zip4jConstants {
     
     //Encryption types
     static final int ENC_NO_ENCRYPTION = -1;
-    static final int ENC_METHOD_STANDARD = 0;
-//    static final int ENC_METHOD_STRONG = 1;
     static final int ENC_METHOD_AES = 99;
     
     //AES Key Strength
-    static final int AES_STRENGTH_128 = 0x01;
-    static final int AES_STRENGTH_192 = 0x02;
     static final int AES_STRENGTH_256 = 0x03;
 }	

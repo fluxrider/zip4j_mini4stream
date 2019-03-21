@@ -55,10 +55,6 @@ public class AESEncrpyter implements IEncrypter {
 		if (password == null || password.length == 0) {
 			throw new RuntimeException("input password is empty or null in AES encrypter constructor");
 		}
-		if (keyStrength != Zip4jConstants.AES_STRENGTH_128 && 
-				keyStrength != Zip4jConstants.AES_STRENGTH_256) {
-			throw new RuntimeException("Invalid key strength in AES encrypter constructor");
-		}
 		
 		this.password = password;
 		this.keyStrength = keyStrength;
@@ -69,20 +65,9 @@ public class AESEncrpyter implements IEncrypter {
 	}
 	
 	private void init() {
-		switch (keyStrength) {
-		case Zip4jConstants.AES_STRENGTH_128:
-			KEY_LENGTH = 16;
-			MAC_LENGTH = 16;
-			SALT_LENGTH = 8;
-			break;
-		case Zip4jConstants.AES_STRENGTH_256:
-			KEY_LENGTH = 32;
-			MAC_LENGTH = 32;
-			SALT_LENGTH = 16;
-			break;
-		default:
-			throw new RuntimeException("invalid aes key strength, cannot determine key sizes");
-		}
+		KEY_LENGTH = 32;
+		MAC_LENGTH = 32;
+		SALT_LENGTH = 16;
 		
 		saltBytes = generateSalt(SALT_LENGTH);
 		byte[] keyBytes = deriveKey(saltBytes, password);
