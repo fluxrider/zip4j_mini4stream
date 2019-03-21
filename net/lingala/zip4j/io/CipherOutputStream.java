@@ -26,7 +26,6 @@ import net.lingala.zip4j.core.HeaderWriter;
 import net.lingala.zip4j.crypto.AESEncrpyter;
 import net.lingala.zip4j.crypto.IEncrypter;
 import net.lingala.zip4j.crypto.StandardEncrypter;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
 import net.lingala.zip4j.model.EndCentralDirRecord;
@@ -65,12 +64,12 @@ public abstract class CipherOutputStream extends OutputStream {
 		this.totalBytesRead = 0;
 	}
 	
-	protected void putNextEntry(ZipParameters zipParameters) throws ZipException {
+	protected void putNextEntry(ZipParameters zipParameters) {
 		try {
 			this.zipParameters = (ZipParameters)zipParameters.clone();
 			
 			if (!Zip4jUtil.isStringNotNullAndNotEmpty(this.zipParameters.getFileNameInZip())) {
-				throw new ZipException("file name is empty for external stream");
+				throw new RuntimeException("file name is empty for external stream");
 			}
 			
 			createFileHeader();
@@ -117,15 +116,13 @@ public abstract class CipherOutputStream extends OutputStream {
 			
 			crc.reset();
 		} catch (CloneNotSupportedException e) {
-			throw new ZipException(e);
-		} catch (ZipException e) {
-			throw e;
+			throw new RuntimeException(e);
 		} catch (Exception e) {
-			throw new ZipException(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
-	private void initEncrypter() throws ZipException {
+	private void initEncrypter() {
 		if (!zipParameters.isEncryptFiles()) {
 			encrypter = null;
 			return;
@@ -140,7 +137,7 @@ public abstract class CipherOutputStream extends OutputStream {
 			encrypter = new AESEncrpyter(zipParameters.getPassword(), zipParameters.getAesKeyStrength());
 			break;
 		default:
-			throw new ZipException("invalid encprytion method");
+			throw new RuntimeException("invalid encprytion method");
 		}
 	}
 	
@@ -210,18 +207,14 @@ public abstract class CipherOutputStream extends OutputStream {
 	
 	private void encryptAndWrite(byte[] b, int off, int len) throws IOException {
 		if (encrypter != null) {
-			try {
-				encrypter.encryptData(b, off, len);
-			} catch (ZipException e) {
-				throw new IOException(e.getMessage());
-			}
+			encrypter.encryptData(b, off, len);
 		}
 		outputStream.write(b, off, len);
 		totalBytesWritten += len;
 		bytesWrittenForThisFile += len;
 	}
 	
-	protected void closeEntry() throws IOException, ZipException {
+	protected void closeEntry() throws IOException {
 		
 		if (this.pendingBufferLength != 0) {
 			encryptAndWrite(pendingBuffer, 0, pendingBufferLength);
@@ -235,7 +228,7 @@ public abstract class CipherOutputStream extends OutputStream {
 				bytesWrittenForThisFile += 10;
 				totalBytesWritten += 10;
 			} else {
-				throw new ZipException("invalid encrypter for AES encrypted file");
+				throw new RuntimeException("invalid encrypter for AES encrypted file");
 			}
 		}
 		fileHeader.setCompressedSize(bytesWrittenForThisFile);
@@ -274,7 +267,7 @@ public abstract class CipherOutputStream extends OutputStream {
 		totalBytesRead = 0;
 	}
 	
-	private void finish() throws IOException, ZipException {
+	private void finish() throws IOException {
 		zipModel.getEndCentralDirRecord().setOffsetOfStartOfCentralDir(totalBytesWritten);
 		
 		HeaderWriter headerWriter = new HeaderWriter();
@@ -282,17 +275,13 @@ public abstract class CipherOutputStream extends OutputStream {
 	}
 	
 	public void close() throws IOException {
-		try {
-			closeEntry();
-			finish();
-		} catch(ZipException e) {
-			throw new RuntimeException(e);
-		}
+		closeEntry();
+		finish();
 		if (outputStream != null)
 			outputStream.close();
 	}
 	
-	private void createFileHeader() throws ZipException {
+	private void createFileHeader() {
 		this.fileHeader = new FileHeader();
 		fileHeader.setSignature((int)InternalZipConstants.CENSIG);
 		fileHeader.setVersionMadeBy(20);
@@ -311,12 +300,12 @@ public abstract class CipherOutputStream extends OutputStream {
 		String fileName = null;
 		fileHeader.setLastModFileTime((int) Zip4jUtil.javaToDosTime(System.currentTimeMillis()));
 		if (!Zip4jUtil.isStringNotNullAndNotEmpty(zipParameters.getFileNameInZip())) {
-			throw new ZipException("fileNameInZip is null or empty");
+			throw new RuntimeException("fileNameInZip is null or empty");
 		}
 		fileName = zipParameters.getFileNameInZip();
 		
 		if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
-			throw new ZipException("fileName is null or empty. unable to create file header");
+			throw new RuntimeException("fileName is null or empty. unable to create file header");
 		}
 		
 		fileHeader.setFileName(fileName);
@@ -349,9 +338,9 @@ public abstract class CipherOutputStream extends OutputStream {
 		fileHeader.setGeneralPurposeFlag(shortByte);
 	}
 	
-	private void createLocalFileHeader() throws ZipException {
+	private void createLocalFileHeader() {
 		if (fileHeader == null) {
-			throw new ZipException("file header is null, cannot create local file header");
+			throw new RuntimeException("file header is null, cannot create local file header");
 		}
 		this.localFileHeader = new LocalFileHeader();
 		localFileHeader.setSignature((int)InternalZipConstants.LOCSIG);
@@ -390,10 +379,10 @@ public abstract class CipherOutputStream extends OutputStream {
 		return generalPurposeBits;
 	}
 	
-	private AESExtraDataRecord generateAESExtraDataRecord(ZipParameters parameters) throws ZipException {
+	private AESExtraDataRecord generateAESExtraDataRecord(ZipParameters parameters) {
 		
 		if (parameters == null) {
-			throw new ZipException("zip parameters are null, cannot generate AES Extra Data record");
+			throw new RuntimeException("parameters null, cannot generate AES Extra Data record");
 		}
 		
 		AESExtraDataRecord aesDataRecord = new AESExtraDataRecord();
@@ -409,7 +398,7 @@ public abstract class CipherOutputStream extends OutputStream {
 		} else if (parameters.getAesKeyStrength() == Zip4jConstants.AES_STRENGTH_256) {
 			aesDataRecord.setAesStrength(Zip4jConstants.AES_STRENGTH_256);
 		} else {
-			throw new ZipException("invalid AES key strength, cannot generate AES Extra data record");
+			throw new RuntimeException("invalid AES key strength");
 		}
 		aesDataRecord.setCompressionMethod(parameters.getCompressionMethod());
 		

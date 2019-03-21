@@ -16,12 +16,10 @@
 
 package net.lingala.zip4j.crypto;
 
-import net.lingala.zip4j.exception.ZipException;
-
 public interface IEncrypter {
 	
-	public int encryptData(byte[] buff) throws ZipException;
+	public int encryptData(byte[] buff);
 	
-	public int encryptData(byte[] buff, int start, int len) throws ZipException;
+	public int encryptData(byte[] buff, int start, int len);
 	
 }

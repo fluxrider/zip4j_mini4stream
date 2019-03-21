@@ -22,7 +22,6 @@ import net.lingala.zip4j.crypto.PBKDF2.MacBasedPRF;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Engine;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Parameters;
 import net.lingala.zip4j.crypto.engine.AESEngine;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jConstants;
@@ -52,13 +51,13 @@ public class AESEncrpyter implements IEncrypter {
 	private byte[] iv;
 	private byte[] counterBlock;
 	
-	public AESEncrpyter(char[] password, int keyStrength) throws ZipException {
+	public AESEncrpyter(char[] password, int keyStrength) {
 		if (password == null || password.length == 0) {
-			throw new ZipException("input password is empty or null in AES encrypter constructor");
+			throw new RuntimeException("input password is empty or null in AES encrypter constructor");
 		}
 		if (keyStrength != Zip4jConstants.AES_STRENGTH_128 && 
 				keyStrength != Zip4jConstants.AES_STRENGTH_256) {
-			throw new ZipException("Invalid key strength in AES encrypter constructor");
+			throw new RuntimeException("Invalid key strength in AES encrypter constructor");
 		}
 		
 		this.password = password;
@@ -69,7 +68,7 @@ public class AESEncrpyter implements IEncrypter {
 		init();
 	}
 	
-	private void init() throws ZipException {
+	private void init() {
 		switch (keyStrength) {
 		case Zip4jConstants.AES_STRENGTH_128:
 			KEY_LENGTH = 16;
@@ -82,14 +81,14 @@ public class AESEncrpyter implements IEncrypter {
 			SALT_LENGTH = 16;
 			break;
 		default:
-			throw new ZipException("invalid aes key strength, cannot determine key sizes");
+			throw new RuntimeException("invalid aes key strength, cannot determine key sizes");
 		}
 		
 		saltBytes = generateSalt(SALT_LENGTH);
 		byte[] keyBytes = deriveKey(saltBytes, password);
 		
 		if (keyBytes == null || keyBytes.length != (KEY_LENGTH + MAC_LENGTH + PASSWORD_VERIFIER_LENGTH)) {
-			throw new ZipException("invalid key generated, cannot decrypt file");
+			throw new RuntimeException("invalid key generated, cannot decrypt file");
 		}
 		
 		aesKey = new byte[KEY_LENGTH];
@@ -105,7 +104,7 @@ public class AESEncrpyter implements IEncrypter {
 		mac.init(macKey);
 	}
 	
-	private byte[] deriveKey(byte[] salt, char[] password) throws ZipException {
+	private byte[] deriveKey(byte[] salt, char[] password) {
 		try {
 			PBKDF2Parameters p = new PBKDF2Parameters("HmacSHA1", "ISO-8859-1",
 	                    salt, 1000);
@@ -113,25 +112,25 @@ public class AESEncrpyter implements IEncrypter {
 	        byte[] derivedKey = e.deriveKey(password, KEY_LENGTH + MAC_LENGTH + PASSWORD_VERIFIER_LENGTH);
 			return derivedKey;
 		} catch (Exception e) {
-			throw new ZipException(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
-	public int encryptData(byte[] buff) throws ZipException {
+	public int encryptData(byte[] buff) {
 		
 		if (buff == null) {
-			throw new ZipException("input bytes are null, cannot perform AES encrpytion");
+			throw new RuntimeException("input bytes are null, cannot perform AES encrpytion");
 		}
 		return encryptData(buff, 0, buff.length);
 	}
 	
-	public int encryptData(byte[] buff, int start, int len) throws ZipException {
+	public int encryptData(byte[] buff, int start, int len) {
 		
 		if (finished) {
 			// A non 16 byte block has already been passed to encrypter
 			// non 16 byte block should be the last block of compressed data in AES encryption
 			// any more encryption will lead to corruption of data
-			throw new ZipException("AES Encrypter is in finished state (A non 16 byte block has already been passed to encrypter)");
+			throw new RuntimeException("AES Encrypter is in finished state (A non 16 byte block has already been passed to encrypter)");
 		}
 		
 		if (len%16!=0) {
@@ -156,10 +155,10 @@ public class AESEncrpyter implements IEncrypter {
 		return len;
 	}
 	
-	private static byte[] generateSalt(int size) throws ZipException {
+	private static byte[] generateSalt(int size) {
 		
 		if (size != 8 && size != 16) {
-			throw new ZipException("invalid salt size, cannot generate salt");
+			throw new RuntimeException("invalid salt size, cannot generate salt");
 		}
 		
 		int rounds = 0;

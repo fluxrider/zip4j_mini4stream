@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.Deflater;
 
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipModel;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.InternalZipConstants;
@@ -33,11 +32,11 @@ public class ZipOutputStream extends CipherOutputStream {
 	protected Deflater deflater;
 	private boolean firstBytesRead;
 	
-	public ZipOutputStream(OutputStream outputStream, ZipParameters zipParameters) throws ZipException {
+	public ZipOutputStream(OutputStream outputStream, ZipParameters zipParameters) {
 		this(outputStream, null, zipParameters);
 	}
 
-	public ZipOutputStream(OutputStream out, ZipModel model, ZipParameters params) throws ZipException {
+	public ZipOutputStream(OutputStream out, ZipModel model, ZipParameters params) {
 		super(out, model);
 		deflater = new Deflater();
 		buff = new byte[InternalZipConstants.BUFF_SIZE];
@@ -45,15 +44,14 @@ public class ZipOutputStream extends CipherOutputStream {
 		putNextEntry(params);
 	}
 	
-	protected void putNextEntry(ZipParameters zipParameters)
-			throws ZipException {
+	protected void putNextEntry(ZipParameters zipParameters) {
 		super.putNextEntry(zipParameters);
 		if (zipParameters.getCompressionMethod() == Zip4jConstants.COMP_DEFLATE) {
 			deflater.reset();
 			if ((zipParameters.getCompressionLevel() < 0 || zipParameters
 					.getCompressionLevel() > 9)
 					&& zipParameters.getCompressionLevel() != -1) {
-				throw new ZipException("invalid compression level for deflater, range is [0,9].");
+				throw new RuntimeException("invalid compression level for deflater, range is [0,9].");
 			}
 			deflater.setLevel(zipParameters.getCompressionLevel());
 		}
@@ -92,7 +90,7 @@ public class ZipOutputStream extends CipherOutputStream {
 		}		
 	}
 	
-	protected void closeEntry() throws IOException, ZipException {
+	protected void closeEntry() throws IOException {
 		if (zipParameters.getCompressionMethod() == Zip4jConstants.COMP_DEFLATE) {
 			if (!deflater.finished()) {
 				deflater.finish();

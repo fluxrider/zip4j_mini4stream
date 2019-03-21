@@ -19,7 +19,6 @@ package net.lingala.zip4j.crypto;
 import java.util.Random;
 
 import net.lingala.zip4j.crypto.engine.ZipCryptoEngine;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.util.InternalZipConstants;
 
 public class StandardEncrypter implements IEncrypter {
@@ -27,9 +26,9 @@ public class StandardEncrypter implements IEncrypter {
 	private ZipCryptoEngine zipCryptoEngine;
 	private byte[] headerBytes;
 	
-	public StandardEncrypter(char[] password, int crc) throws ZipException {
+	public StandardEncrypter(char[] password, int crc) {
 		if (password == null || password.length <= 0) {
-			throw new ZipException("input password is null or empty in standard encrpyter constructor");
+			throw new RuntimeException("input password is null or empty in standard encrpyter constructor");
 		}
 		
 		this.zipCryptoEngine = new ZipCryptoEngine();
@@ -38,9 +37,9 @@ public class StandardEncrypter implements IEncrypter {
 		init(password, crc);
 	}
 	
-	private void init(char[] password, int crc) throws ZipException {
+	private void init(char[] password, int crc) {
 		if (password == null || password.length <= 0) {
-			throw new ZipException("input password is null or empty, cannot initialize standard encrypter");
+			throw new RuntimeException("input password is null or empty, cannot initialize standard encrypter");
 		}
 		zipCryptoEngine.initKeys(password);
 		headerBytes = generateRandomBytes(InternalZipConstants.STD_DEC_HDR_SIZE);
@@ -51,23 +50,23 @@ public class StandardEncrypter implements IEncrypter {
 		headerBytes[InternalZipConstants.STD_DEC_HDR_SIZE - 2] = (byte)((crc >>> 16));
 		
 		if (headerBytes.length < InternalZipConstants.STD_DEC_HDR_SIZE) {
-			throw new ZipException("invalid header bytes generated, cannot perform standard encryption");
+			throw new RuntimeException("invalid header bytes generated, cannot perform standard encryption");
 		}
 		
 		encryptData(headerBytes);
 	}
 	
-	public int encryptData(byte[] buff) throws ZipException {
+	public int encryptData(byte[] buff) {
 		if (buff == null) {
 			throw new NullPointerException();
 		}
 		return encryptData(buff, 0, buff.length);
 	}
 	
-	public int encryptData(byte[] buff, int start, int len) throws ZipException {
+	public int encryptData(byte[] buff, int start, int len) {
 		
 		if (len < 0) {
-			throw new ZipException("invalid length specified to decrpyt data");
+			throw new RuntimeException("invalid length specified to decrpyt data");
 		}
 		
 		try {
@@ -76,7 +75,7 @@ public class StandardEncrypter implements IEncrypter {
 			}
 			return len;
 		} catch (Exception e) {
-			throw new ZipException(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -86,10 +85,10 @@ public class StandardEncrypter implements IEncrypter {
 		return temp_val;
 	}
 	
-	protected byte[] generateRandomBytes(int size) throws ZipException {
+	protected byte[] generateRandomBytes(int size) {
 		
 		if (size <= 0) {
-			throw new ZipException("size is either 0 or less than 0, cannot generate header for standard encryptor");
+			throw new RuntimeException("size is either 0 or less than 0, cannot generate header for standard encryptor");
 		}
 		
 		byte[] buff = new byte[size];

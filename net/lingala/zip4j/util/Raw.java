@@ -19,8 +19,6 @@ package net.lingala.zip4j.util;
 import java.io.DataInput;
 import java.io.IOException;
 
-import net.lingala.zip4j.exception.ZipException;
-
 public class Raw
 {
 	public static long readLongLittleEndian(byte[] array,int pos){
@@ -43,11 +41,11 @@ public class Raw
 		return temp;
 	}
 	
-	public static int readLeInt(DataInput di, byte[] b) throws ZipException{
+	public static int readLeInt(DataInput di, byte[] b) {
 		try {
 			di.readFully(b, 0, 4);
 		} catch (IOException e) {
-			throw new ZipException(e);
+			throw new RuntimeException(e);
 		}
 	    return ((b[0] & 0xff) | (b[1] & 0xff) << 8)
 		    | ((b[2] & 0xff) | (b[3] & 0xff) << 8) << 16;
@@ -116,17 +114,17 @@ public class Raw
 		array[pos] = (byte) (value &0xFF);
 	}
 	
-	public static byte bitArrayToByte(int[] bitArray) throws ZipException {
+	public static byte bitArrayToByte(int[] bitArray) {
 		if (bitArray == null) {
-			throw new ZipException("bit array is null, cannot calculate byte from bits");
+			throw new RuntimeException("bit array is null, cannot calculate byte from bits");
 		}
 		
 		if (bitArray.length != 8) {
-			throw new ZipException("invalid bit array length, cannot calculate byte");
+			throw new RuntimeException("invalid bit array length, cannot calculate byte");
 		}
 		
 		if(!checkBits(bitArray)) {
-			throw new ZipException("invalid bits provided, bits contain other values than 0 or 1");
+			throw new RuntimeException("invalid bits provided, bits contain other values than 0 or 1");
 		}
 		
 		int retNum = 0;

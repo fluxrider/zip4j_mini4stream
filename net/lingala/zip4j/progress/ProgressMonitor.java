@@ -16,8 +16,6 @@
 
 package net.lingala.zip4j.progress;
 
-import net.lingala.zip4j.exception.ZipException;
-
 /**
  * If Zip4j is set to run in thread mode, this class helps retrieve current progress
  *
@@ -136,12 +134,12 @@ public class ProgressMonitor {
 		this.exception = exception;
 	}
 	
-	public void endProgressMonitorSuccess() throws ZipException {
+	public void endProgressMonitorSuccess() {
 		reset();
 		result = ProgressMonitor.RESULT_SUCCESS;
 	}
 	
-	public void endProgressMonitorError(Throwable e) throws ZipException {
+	public void endProgressMonitorError(Throwable e) {
 		reset();
 		result = ProgressMonitor.RESULT_ERROR;
 		exception = e;

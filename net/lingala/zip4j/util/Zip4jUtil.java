@@ -25,7 +25,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipModel;
 
@@ -39,9 +38,9 @@ public class Zip4jUtil {
 		return true;
 	}
 	
-	public static boolean checkOutputFolder(String path) throws ZipException {
+	public static boolean checkOutputFolder(String path) {
 		if (!isStringNotNullAndNotEmpty(path)) {
-			throw new ZipException(new NullPointerException("output path is null"));
+			throw new RuntimeException(new NullPointerException("output path is null"));
 		}
 		
 		File file = new File(path);
@@ -49,84 +48,77 @@ public class Zip4jUtil {
 		if (file.exists()) {
 		
 			if (!file.isDirectory()) {
-				throw new ZipException("output folder is not valid");
+				throw new RuntimeException("output folder is not valid");
 			}
 			
 			if (!file.canWrite()) {
-				throw new ZipException("no write access to output folder");
+				throw new RuntimeException("no write access to output folder");
 			}
 		} else {
 			try {
 				file.mkdirs();
 				if (!file.isDirectory()) {
-					throw new ZipException("output folder is not valid");
+					throw new RuntimeException("output folder is not valid");
 				}
 				
 				if (!file.canWrite()) {
-					throw new ZipException("no write access to destination folder");
+					throw new RuntimeException("no write access to destination folder");
 				}
 				
-//				SecurityManager manager = new SecurityManager();
-//				try {
-//					manager.checkWrite(file.getAbsolutePath());
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//					throw new ZipException("no write access to destination folder");
-//				}
 			} catch (Exception e) {
-				throw new ZipException("Cannot create destination folder");
+				throw new RuntimeException("Cannot create destination folder");
 			}
 		}
 		
 		return true;
 	}
 	
-	public static boolean checkFileReadAccess(String path) throws ZipException {
+	public static boolean checkFileReadAccess(String path) throws RuntimeException {
 		if (!isStringNotNullAndNotEmpty(path)) {
-			throw new ZipException("path is null");
+			throw new RuntimeException("path is null");
 		}
 		
 		if (!checkFileExists(path)) {
-			throw new ZipException("file does not exist: " + path);
+			throw new RuntimeException("file does not exist: " + path);
 		}
 		
 		try {
 			File file = new File(path);
 			return file.canRead();
 		} catch (Exception e) {
-			throw new ZipException("cannot read zip file");
+			throw new RuntimeException("cannot read zip file");
 		}
 	}
 	
-	public static boolean checkFileWriteAccess(String path) throws ZipException {
+	public static boolean checkFileWriteAccess(String path) {
 		if (!isStringNotNullAndNotEmpty(path)) {
-			throw new ZipException("path is null");
+			throw new RuntimeException("path is null");
 		}
 		
 		if (!checkFileExists(path)) {
-			throw new ZipException("file does not exist: " + path);
+			throw new RuntimeException("file does not exist: " + path);
 		}
 		
 		try {
 			File file = new File(path);
 			return file.canWrite();
 		} catch (Exception e) {
-			throw new ZipException("cannot read zip file");
+			throw new RuntimeException("cannot read zip file");
 		}
 	}
 	
-	public static boolean checkFileExists(String path) throws ZipException {
+	public static boolean checkFileExists(String path) {
 		if (!isStringNotNullAndNotEmpty(path)) {
-			throw new ZipException("path is null");
+			throw new RuntimeException("path is null");
 		}
 		
 		File file = new File(path);
 		return checkFileExists(file);
 	}
 	
-	public static boolean checkFileExists(File file) throws ZipException {
+	public static boolean checkFileExists(File file) {
 		if (file == null) {
-			throw new ZipException("cannot check if file exists: input file is null");
+			throw new RuntimeException("cannot check if file exists: input file is null");
 		}
 		return file.exists();
 	}
@@ -136,9 +128,9 @@ public class Zip4jUtil {
 	    return (os.indexOf( "win" ) >= 0); 
 	}
 	
-	public static void setFileReadOnly(File file) throws ZipException {
+	public static void setFileReadOnly(File file) {
 		if (file == null) {
-			throw new ZipException("input file is null. cannot set read only file attribute");
+			throw new RuntimeException("input file is null. cannot set read only file attribute");
 		}
 		
 		if (file.exists()) {
@@ -146,83 +138,21 @@ public class Zip4jUtil {
 		}
 	}
 	
-	public static void setFileHidden(File file) throws ZipException {		
-//		if (file == null) {
-//			throw new ZipException("input file is null. cannot set hidden file attribute");
-//		}
-//		
-//		if (!isWindows()) {
-//			return;
-//		}
-//		
-//		if (file.exists()) {
-//			try {
-//				Runtime.getRuntime().exec("attrib +H \"" + file.getAbsolutePath() + "\"");
-//			} catch (IOException e) {
-//				// do nothing as this is not of a higher priority
-//				// add log statements here when logging is done
-//			}
-//		}
-	}
-	
-	public static void setFileArchive(File file) throws ZipException {		
-//		if (file == null) {
-//			throw new ZipException("input file is null. cannot set archive file attribute");
-//		}
-//		
-//		if (!isWindows()) {
-//			return;
-//		}
-//		
-//		if (file.exists()) {
-//			try {
-//				if (file.isDirectory()) {
-//					Runtime.getRuntime().exec("attrib +A \"" + file.getAbsolutePath() + "\"");
-//				} else {
-//					Runtime.getRuntime().exec("attrib +A \"" + file.getAbsolutePath() + "\"");
-//				}
-//				
-//			} catch (IOException e) {
-//				// do nothing as this is not of a higher priority
-//				// add log statements here when logging is done
-//			}
-//		}
-	}
-	
-	public static void setFileSystemMode(File file) throws ZipException {
-//		if (file == null) {
-//			throw new ZipException("input file is null. cannot set archive file attribute");
-//		}
-//		
-//		if (!isWindows()) {
-//			return;
-//		}
-//		
-//		if (file.exists()) {
-//			try {
-//				Runtime.getRuntime().exec("attrib +S \"" + file.getAbsolutePath() + "\"");
-//			} catch (IOException e) {
-//				// do nothing as this is not of a higher priority
-//				// add log statements here when logging is done
-//			}
-//		}
-	}
-	
-	public static long getLastModifiedFileTime(File file, TimeZone timeZone) throws ZipException {
+	public static long getLastModifiedFileTime(File file, TimeZone timeZone) {
 		if (file == null) {
-			throw new ZipException("input file is null, cannot read last modified file time");
+			throw new RuntimeException("input file is null, cannot read last modified file time");
 		}
 		
 		if (!file.exists()) {
-			throw new ZipException("input file does not exist, cannot read last modified file time");
+			throw new RuntimeException("input file does not exist, cannot read last modified file time");
 		}
 		
 		return file.lastModified();
 	}
 	
-	public static String getFileNameFromFilePath(File file) throws ZipException {
+	public static String getFileNameFromFilePath(File file) {
 		if (file == null) {
-			throw new ZipException("input file is null, cannot get file name");
+			throw new RuntimeException("input file is null, cannot get file name");
 		}
 		
 		if (file.isDirectory()) {
@@ -232,17 +162,17 @@ public class Zip4jUtil {
 		return file.getName();
 	}
 	
-	public static long getFileLengh(String file) throws ZipException {
+	public static long getFileLengh(String file) {
 		if (!isStringNotNullAndNotEmpty(file)) {
-			throw new ZipException("invalid file name");
+			throw new RuntimeException("invalid file name");
 		}
 		
 		return getFileLengh(new File(file));
 	}
 	
-	public static long getFileLengh(File file) throws ZipException {
+	public static long getFileLengh(File file) {
 		if (file == null) {
-			throw new ZipException("input file is null, cannot calculate file length");
+			throw new RuntimeException("input file is null, cannot calculate file length");
 		}
 		
 		if (file.isDirectory()) {
@@ -290,13 +220,13 @@ public class Zip4jUtil {
 		return cal.getTime().getTime();
 	}
 	
-	public static FileHeader getFileHeader(ZipModel zipModel, String fileName) throws ZipException {
+	public static FileHeader getFileHeader(ZipModel zipModel, String fileName) {
 		if (zipModel == null) {
-			throw new ZipException("zip model is null, cannot determine file header for fileName: " + fileName);
+			throw new RuntimeException("zip model is null, cannot determine file header for fileName: " + fileName);
 		}
 		
 		if (!isStringNotNullAndNotEmpty(fileName)) {
-			throw new ZipException("file name is null, cannot determine file header for fileName: " + fileName);
+			throw new RuntimeException("file name is null, cannot determine file header for fileName: " + fileName);
 		}
 		
 		FileHeader fileHeader = null;
@@ -315,21 +245,21 @@ public class Zip4jUtil {
 		return fileHeader;
 	}
 	
-	public static FileHeader getFileHeaderWithExactMatch(ZipModel zipModel, String fileName) throws ZipException {
+	public static FileHeader getFileHeaderWithExactMatch(ZipModel zipModel, String fileName) {
 		if (zipModel == null) {
-			throw new ZipException("zip model is null, cannot determine file header with exact match for fileName: " + fileName);
+			throw new RuntimeException("zip model is null, cannot determine file header with exact match for fileName: " + fileName);
 		}
 		
 		if (!isStringNotNullAndNotEmpty(fileName)) {
-			throw new ZipException("file name is null, cannot determine file header with exact match for fileName: " + fileName);
+			throw new RuntimeException("file name is null, cannot determine file header with exact match for fileName: " + fileName);
 		}
 		
 		if (zipModel.getCentralDirectory() == null) {
-			throw new ZipException("central directory is null, cannot determine file header with exact match for fileName: " + fileName);
+			throw new RuntimeException("central directory is null, cannot determine file header with exact match for fileName: " + fileName);
 		}
 		
 		if (zipModel.getCentralDirectory().getFileHeaders() == null) {
-			throw new ZipException("file Headers are null, cannot determine file header with exact match for fileName: " + fileName);
+			throw new RuntimeException("file Headers are null, cannot determine file header with exact match for fileName: " + fileName);
 		}
 		
 		if (zipModel.getCentralDirectory().getFileHeaders().size() <= 0) {
@@ -352,18 +282,18 @@ public class Zip4jUtil {
 	}
 	
 	public static int getIndexOfFileHeader(ZipModel zipModel, 
-			FileHeader fileHeader) throws ZipException {
+			FileHeader fileHeader) {
 		
 		if (zipModel == null || fileHeader == null) {
-			throw new ZipException("input parameters is null, cannot determine index of file header");
+			throw new RuntimeException("input parameters is null, cannot determine index of file header");
 		}
 		
 		if (zipModel.getCentralDirectory() == null) {
-			throw new ZipException("central directory is null, ccannot determine index of file header");
+			throw new RuntimeException("central directory is null, ccannot determine index of file header");
 		}
 		
 		if (zipModel.getCentralDirectory().getFileHeaders() == null) {
-			throw new ZipException("file Headers are null, cannot determine index of file header");
+			throw new RuntimeException("file Headers are null, cannot determine index of file header");
 		}
 		
 		if (zipModel.getCentralDirectory().getFileHeaders().size() <= 0) {
@@ -372,7 +302,7 @@ public class Zip4jUtil {
 		String fileName = fileHeader.getFileName();
 		
 		if (!isStringNotNullAndNotEmpty(fileName)) {
-			throw new ZipException("file name in file header is empty or null, cannot determine index of file header");
+			throw new RuntimeException("file name in file header is empty or null, cannot determine index of file header");
 		}
 		
 		ArrayList fileHeaders = zipModel.getCentralDirectory().getFileHeaders();
@@ -391,10 +321,10 @@ public class Zip4jUtil {
 	}
 	
 	public static ArrayList getFilesInDirectoryRec(File path, 
-			boolean readHiddenFiles) throws ZipException {
+			boolean readHiddenFiles) {
 		
 		if (path == null) {
-			throw new ZipException("input path is null, cannot read files in the directory");
+			throw new RuntimeException("input path is null, cannot read files in the directory");
 		}
 		
 		ArrayList result = new ArrayList();
@@ -419,9 +349,9 @@ public class Zip4jUtil {
 		return result;
 	}
 	
-	public static String getZipFileNameWithoutExt(String zipFile) throws ZipException {
+	public static String getZipFileNameWithoutExt(String zipFile) {
 		if (!isStringNotNullAndNotEmpty(zipFile)) {
-			throw new ZipException("zip file name is empty or null, cannot determine zip file name");
+			throw new RuntimeException("zip file name is empty or null, cannot determine zip file name");
 		}
 		String tmpFileName = zipFile;
 		if (zipFile.indexOf(System.getProperty("file.separator")) >= 0) {
@@ -434,7 +364,7 @@ public class Zip4jUtil {
 		return tmpFileName;
 	}
 	
-	public static byte[] convertCharset(String str) throws ZipException {
+	public static byte[] convertCharset(String str) {
 		try {
 			byte[] converted = null;
 			String charSet = detectCharSet(str);
@@ -450,7 +380,7 @@ public class Zip4jUtil {
 		catch (UnsupportedEncodingException err) {
 			return str.getBytes();
 		} catch (Exception e) {
-			throw new ZipException(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -495,9 +425,9 @@ public class Zip4jUtil {
 	 * @param filePath
 	 * @return String
 	 */
-	public static String getAbsoluteFilePath(String filePath) throws ZipException {
+	public static String getAbsoluteFilePath(String filePath) {
 		if (!isStringNotNullAndNotEmpty(filePath)) {
-			throw new ZipException("filePath is null or empty, cannot get absolute file path");
+			throw new RuntimeException("filePath is null or empty, cannot get absolute file path");
 		}
 		
 		File file = new File(filePath);
@@ -510,10 +440,10 @@ public class Zip4jUtil {
 	 * @param type - type of elements to be present in the list (ex: File, String, etc)
 	 * @return true if all elements match the given type, if not returns false
 	 */
-	public static boolean checkArrayListTypes(ArrayList sourceList, int type) throws ZipException {
+	public static boolean checkArrayListTypes(ArrayList sourceList, int type) {
 		
 		if (sourceList == null) {
-			throw new ZipException("input arraylist is null, cannot check types");
+			throw new RuntimeException("input arraylist is null, cannot check types");
 		}
 		
 		if (sourceList.size() <= 0) {
@@ -549,12 +479,11 @@ public class Zip4jUtil {
 	 * Detects the encoding charset for the input string
 	 * @param str
 	 * @return String - charset for the String
-	 * @throws ZipException - if input string is null. In case of any other exception
 	 * this method returns default System charset
 	 */
-	public static String detectCharSet(String str) throws ZipException {
+	public static String detectCharSet(String str) {
 		if (str == null) {
-			throw new ZipException("input string is null, cannot detect charset");
+			throw new RuntimeException("input string is null, cannot detect charset");
 		}
 		
 		try {
@@ -586,11 +515,10 @@ public class Zip4jUtil {
 	 * byte buffer
 	 * @param str
 	 * @return length of the string
-	 * @throws ZipException
 	 */
-	public static int getEncodedStringLength(String str) throws ZipException {
+	public static int getEncodedStringLength(String str) {
 		if (!isStringNotNullAndNotEmpty(str)) {
-			throw new ZipException("input string is null, cannot calculate encoded String length");
+			throw new RuntimeException("input string is null, cannot calculate encoded String length");
 		}
 		
 		String charset = detectCharSet(str);
@@ -602,15 +530,14 @@ public class Zip4jUtil {
 	 * @param str
 	 * @param charset
 	 * @return int
-	 * @throws ZipException
 	 */
-	public static int getEncodedStringLength(String str, String charset) throws ZipException {
+	public static int getEncodedStringLength(String str, String charset) {
 		if (!isStringNotNullAndNotEmpty(str)) {
-			throw new ZipException("input string is null, cannot calculate encoded String length");
+			throw new RuntimeException("input string is null, cannot calculate encoded String length");
 		}
 		
 		if (!isStringNotNullAndNotEmpty(charset)) {
-			throw new ZipException("encoding is not defined, cannot calculate string length");
+			throw new RuntimeException("encoding is not defined, cannot calculate string length");
 		}
 		
 		ByteBuffer byteBuffer = null;
@@ -626,7 +553,7 @@ public class Zip4jUtil {
 		} catch (UnsupportedEncodingException e) {
 			byteBuffer = ByteBuffer.wrap(str.getBytes());
 		} catch (Exception e) {
-			throw new ZipException(e);
+			throw new RuntimeException(e);
 		}
 		
 		return byteBuffer.limit();
@@ -636,11 +563,10 @@ public class Zip4jUtil {
 	 * Checks if the input charset is supported
 	 * @param charset
 	 * @return boolean
-	 * @throws ZipException
 	 */
-	public static boolean isSupportedCharset(String charset) throws ZipException {
+	public static boolean isSupportedCharset(String charset) {
 		if (!isStringNotNullAndNotEmpty(charset)) {
-			throw new ZipException("charset is null or empty, cannot check if it is supported");
+			throw new RuntimeException("charset is null or empty, cannot check if it is supported");
 		}
 		
 		try {
@@ -649,13 +575,13 @@ public class Zip4jUtil {
 		} catch (UnsupportedEncodingException e) {
 			return false;
 		} catch (Exception e) {
-			throw new ZipException(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
-	public static ArrayList getSplitZipFiles(ZipModel zipModel) throws ZipException {
+	public static ArrayList getSplitZipFiles(ZipModel zipModel) {
 		if (zipModel == null) {
-			throw new ZipException("cannot get split zip files: zipmodel is null");
+			throw new RuntimeException("cannot get split zip files: zipmodel is null");
 		}
 		
 		if (zipModel.getEndCentralDirRecord() == null) {
@@ -668,7 +594,7 @@ public class Zip4jUtil {
 		String partFile = null;
 		
 		if (!isStringNotNullAndNotEmpty(currZipFile)) {
-			throw new ZipException("cannot get split zip files: zipfile is null");
+			throw new RuntimeException("cannot get split zip files: zipfile is null");
 		}
 		
 		if (!zipModel.isSplitArchive()) {
@@ -699,9 +625,9 @@ public class Zip4jUtil {
 		return retList;
 	}
 	
-	public static String getRelativeFileName(String file, String rootFolderInZip, String rootFolderPath) throws ZipException {
+	public static String getRelativeFileName(String file, String rootFolderInZip, String rootFolderPath) {
 		if (!Zip4jUtil.isStringNotNullAndNotEmpty(file)) {
-			throw new ZipException("input file path/name is empty, cannot calculate relative file name");
+			throw new RuntimeException("input file path/name is empty, cannot calculate relative file name");
 		}
 		
 		String fileName = null;
@@ -747,7 +673,7 @@ public class Zip4jUtil {
 		}
 		
 		if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
-			throw new ZipException("Error determining file name");
+			throw new RuntimeException("Error determining file name");
 		}
 		
 		return fileName;

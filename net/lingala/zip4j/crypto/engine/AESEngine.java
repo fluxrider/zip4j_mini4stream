@@ -16,7 +16,6 @@
 
 package net.lingala.zip4j.crypto.engine;
 
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.util.InternalZipConstants;
 
 /**
@@ -30,21 +29,21 @@ public class AESEngine {
     private int[][] workingKey = null;
     private int C0, C1, C2, C3;
 	
-    public AESEngine(byte[] key) throws ZipException {
+    public AESEngine(byte[] key) {
 		init(key);
 	}
     
-    public void init(byte[] key) throws ZipException {
+    public void init(byte[] key) {
         workingKey = generateWorkingKey(key);
     }
     
-    private int[][] generateWorkingKey(byte[] key) throws ZipException {
+    private int[][] generateWorkingKey(byte[] key) {
         int         kc = key.length / 4;
         int         t;
         
         if (((kc != 4) && (kc != 6) && (kc != 8)) || ((kc * 4) != key.length))
         {
-            throw new ZipException("invalid key length (not 128/192/256)");
+            throw new RuntimeException("invalid key length (not 128/192/256)");
         }
 
         rounds = kc + 6;
@@ -77,24 +76,24 @@ public class AESEngine {
         return W;
     }
     
-    public int processBlock(byte[] in, byte[] out) throws ZipException {
+    public int processBlock(byte[] in, byte[] out) {
     	return processBlock(in, 0, out, 0);
     }
     
-    public int processBlock(byte[] in, int inOff, byte[] out, int outOff) throws ZipException {
+    public int processBlock(byte[] in, int inOff, byte[] out, int outOff) {
         if (workingKey == null)
         {
-            throw new ZipException("AES engine not initialised");
+            throw new RuntimeException("AES engine not initialised");
         }
 
         if ((inOff + (32 / 2)) > in.length)
         {
-            throw new ZipException("input buffer too short");
+            throw new RuntimeException("input buffer too short");
         }
 
         if ((outOff + (32 / 2)) > out.length)
         {
-            throw new ZipException("output buffer too short");
+            throw new RuntimeException("output buffer too short");
         }
         
         stateIn(in, inOff);
