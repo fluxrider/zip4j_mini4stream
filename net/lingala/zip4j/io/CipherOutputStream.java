@@ -72,12 +72,6 @@ public class CipherOutputStream extends BaseOutputStream {
 			if (!Zip4jUtil.isStringNotNullAndNotEmpty(this.zipParameters.getFileNameInZip())) {
 				throw new ZipException("file name is empty for external stream");
 			}
-			if (this.zipParameters.getFileNameInZip().endsWith("/") || 
-					this.zipParameters.getFileNameInZip().endsWith("\\")) {
-				this.zipParameters.setEncryptFiles(false);
-				this.zipParameters.setEncryptionMethod(-1);
-				this.zipParameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
-			}
 			
 			createFileHeader();
 			createLocalFileHeader();
