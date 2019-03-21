@@ -16,11 +16,9 @@
 
 package net.lingala.zip4j.util;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.Calendar;
-import java.util.TimeZone;
 
 public class Zip4jUtil {
 	
@@ -30,150 +28,6 @@ public class Zip4jUtil {
 		}
 		
 		return true;
-	}
-	
-	public static boolean checkOutputFolder(String path) {
-		if (!isStringNotNullAndNotEmpty(path)) {
-			throw new RuntimeException(new NullPointerException("output path is null"));
-		}
-		
-		File file = new File(path);
-		
-		if (file.exists()) {
-		
-			if (!file.isDirectory()) {
-				throw new RuntimeException("output folder is not valid");
-			}
-			
-			if (!file.canWrite()) {
-				throw new RuntimeException("no write access to output folder");
-			}
-		} else {
-			try {
-				file.mkdirs();
-				if (!file.isDirectory()) {
-					throw new RuntimeException("output folder is not valid");
-				}
-				
-				if (!file.canWrite()) {
-					throw new RuntimeException("no write access to destination folder");
-				}
-				
-			} catch (Exception e) {
-				throw new RuntimeException("Cannot create destination folder");
-			}
-		}
-		
-		return true;
-	}
-	
-	public static boolean checkFileReadAccess(String path) throws RuntimeException {
-		if (!isStringNotNullAndNotEmpty(path)) {
-			throw new RuntimeException("path is null");
-		}
-		
-		if (!checkFileExists(path)) {
-			throw new RuntimeException("file does not exist: " + path);
-		}
-		
-		try {
-			File file = new File(path);
-			return file.canRead();
-		} catch (Exception e) {
-			throw new RuntimeException("cannot read zip file");
-		}
-	}
-	
-	public static boolean checkFileWriteAccess(String path) {
-		if (!isStringNotNullAndNotEmpty(path)) {
-			throw new RuntimeException("path is null");
-		}
-		
-		if (!checkFileExists(path)) {
-			throw new RuntimeException("file does not exist: " + path);
-		}
-		
-		try {
-			File file = new File(path);
-			return file.canWrite();
-		} catch (Exception e) {
-			throw new RuntimeException("cannot read zip file");
-		}
-	}
-	
-	public static boolean checkFileExists(String path) {
-		if (!isStringNotNullAndNotEmpty(path)) {
-			throw new RuntimeException("path is null");
-		}
-		
-		File file = new File(path);
-		return checkFileExists(file);
-	}
-	
-	public static boolean checkFileExists(File file) {
-		if (file == null) {
-			throw new RuntimeException("cannot check if file exists: input file is null");
-		}
-		return file.exists();
-	}
-	
-	public static boolean isWindows(){
-		String os = System.getProperty("os.name").toLowerCase();
-	    return (os.indexOf( "win" ) >= 0); 
-	}
-	
-	public static void setFileReadOnly(File file) {
-		if (file == null) {
-			throw new RuntimeException("input file is null. cannot set read only file attribute");
-		}
-		
-		if (file.exists()) {
-			file.setReadOnly();
-		}
-	}
-	
-	public static long getLastModifiedFileTime(File file, TimeZone timeZone) {
-		if (file == null) {
-			throw new RuntimeException("input file is null, cannot read last modified file time");
-		}
-		
-		if (!file.exists()) {
-			throw new RuntimeException("input file does not exist, cannot read last modified file time");
-		}
-		
-		return file.lastModified();
-	}
-	
-	public static String getFileNameFromFilePath(File file) {
-		if (file == null) {
-			throw new RuntimeException("input file is null, cannot get file name");
-		}
-		
-		if (file.isDirectory()) {
-			return null;
-		}
-		
-		return file.getName();
-	}
-	
-	public static long getFileLengh(String file) {
-		if (!isStringNotNullAndNotEmpty(file)) {
-			throw new RuntimeException("invalid file name");
-		}
-		
-		return getFileLengh(new File(file));
-	}
-	
-	public static long getFileLengh(File file) {
-		if (file == null) {
-			throw new RuntimeException("input file is null, cannot calculate file length");
-		}
-		
-		if (file.isDirectory()) {
-			return -1;
-		}
-		
-		return file.length();
 	}
 	
 	/**
@@ -195,41 +49,6 @@ public class Zip4jUtil {
 	               cal.get(Calendar.SECOND) >> 1;
 	}
 	
-	/**
-	 * Converts time in dos format to Java format
-	 * @param dosTime
-	 * @return time in java format
-	 */
-	public static long dosToJavaTme(int dosTime) {
-		int sec = 2 * (dosTime & 0x1f);
-	    int min = (dosTime >> 5) & 0x3f;
-	    int hrs = (dosTime >> 11) & 0x1f;
-	    int day = (dosTime >> 16) & 0x1f;
-	    int mon = ((dosTime >> 21) & 0xf) - 1;
-	    int year = ((dosTime >> 25) & 0x7f) + 1980;
-	    
-	    Calendar cal = Calendar.getInstance();
-		cal.set(year, mon, day, hrs, min, sec);
-		cal.set(Calendar.MILLISECOND, 0);
-		return cal.getTime().getTime();
-	}
-	
-	
-	public static String getZipFileNameWithoutExt(String zipFile) {
-		if (!isStringNotNullAndNotEmpty(zipFile)) {
-			throw new RuntimeException("zip file name is empty or null, cannot determine zip file name");
-		}
-		String tmpFileName = zipFile;
-		if (zipFile.indexOf(System.getProperty("file.separator")) >= 0) {
-			tmpFileName = zipFile.substring(zipFile.lastIndexOf(System.getProperty("file.separator")));
-		}
-		
-		if (tmpFileName.indexOf(".") > 0) {
-			tmpFileName = tmpFileName.substring(0, tmpFileName.lastIndexOf("."));
-		}
-		return tmpFileName;
-	}
-	
 	public static byte[] convertCharset(String str) {
 		try {
 			byte[] converted = null;
@@ -248,55 +67,6 @@ public class Zip4jUtil {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
-	
-	/**
-	 * Decodes file name based on encoding. If file name is UTF 8 encoded
-	 * returns an UTF8 encoded string, else return Cp850 encoded String. If 
-	 * appropriate charset is not supported, then returns a System default 
-	 * charset encoded String
-	 * @param data
-	 * @param isUTF8
-	 * @return String
-	 */
-	public static String decodeFileName(byte[] data, boolean isUTF8) {
-		if (isUTF8) {
-			try {
-				return new String(data, InternalZipConstants.CHARSET_UTF8);
-			} catch (UnsupportedEncodingException e) {
-				return new String(data);
-			}
-		}
-		return getCp850EncodedString(data);
-	}
-	
-	/**
-	 * Returns a string in Cp850 encoding from the input bytes.
-	 * If this encoding is not supported, then String with the default encoding is returned.
-	 * @param data
-	 * @return String
-	 */
-	public static String getCp850EncodedString(byte[] data) {
-		try {
-			String retString = new String(data, InternalZipConstants.CHARSET_CP850);
-			return retString;
-		} catch (UnsupportedEncodingException e) {
-			return new String(data);
-		}
-	}
-	
-	/**
-	 * Returns an absoulte path for the given file path 
-	 * @param filePath
-	 * @return String
-	 */
-	public static String getAbsoluteFilePath(String filePath) {
-		if (!isStringNotNullAndNotEmpty(filePath)) {
-			throw new RuntimeException("filePath is null or empty, cannot get absolute file path");
-		}
-		
-		File file = new File(filePath);
-		return file.getAbsolutePath();
 	}
 	
 	/**
@@ -383,75 +153,4 @@ public class Zip4jUtil {
 		return byteBuffer.limit();
 	}
 	
-	public static String getRelativeFileName(String file, String rootFolderInZip, String rootFolderPath) {
-		if (!Zip4jUtil.isStringNotNullAndNotEmpty(file)) {
-			throw new RuntimeException("input file path/name is empty, cannot calculate relative file name");
-		}
-		
-		String fileName = null;
-		
-		if (Zip4jUtil.isStringNotNullAndNotEmpty(rootFolderPath)) {
-			
-			File rootFolderFile = new File(rootFolderPath);
-			
-			String rootFolderFileRef = rootFolderFile.getPath();
-			
-			if (!rootFolderFileRef.endsWith(InternalZipConstants.FILE_SEPARATOR)) {
-				rootFolderFileRef += InternalZipConstants.FILE_SEPARATOR;
-			}
-			
-			String tmpFileName = file.substring(rootFolderFileRef.length());
-			if (tmpFileName.startsWith(System.getProperty("file.separator"))) {
-				tmpFileName = tmpFileName.substring(1);
-			}
-			
-			File tmpFile = new File(file);
-			
-			if (tmpFile.isDirectory()) {
-				tmpFileName = tmpFileName.replaceAll("\\\\", "/");
-				tmpFileName += InternalZipConstants.ZIP_FILE_SEPARATOR;
-			} else {
-				String bkFileName = tmpFileName.substring(0, tmpFileName.lastIndexOf(tmpFile.getName()));
-				bkFileName = bkFileName.replaceAll("\\\\", "/");
-				tmpFileName = bkFileName + tmpFile.getName();
-			}
-			
-			fileName = tmpFileName;
-		} else {
-			File relFile = new File(file);
-			if (relFile.isDirectory()) {
-				fileName = relFile.getName() + InternalZipConstants.ZIP_FILE_SEPARATOR;
-			} else {
-				fileName = Zip4jUtil.getFileNameFromFilePath(new File(file));
-			}
-		}
-		
-		if (Zip4jUtil.isStringNotNullAndNotEmpty(rootFolderInZip)) {
-			fileName = rootFolderInZip + fileName;
-		}
-		
-		if (!Zip4jUtil.isStringNotNullAndNotEmpty(fileName)) {
-			throw new RuntimeException("Error determining file name");
-		}
-		
-		return fileName;
-	}
-	
-	public static long[] getAllHeaderSignatures() {
-		long[] allSigs = new long[11];
-		
-		allSigs[0] = InternalZipConstants.LOCSIG;
-		allSigs[1] = InternalZipConstants.EXTSIG;
-		allSigs[2] = InternalZipConstants.CENSIG;
-		allSigs[3] = InternalZipConstants.ENDSIG;
-		allSigs[4] = InternalZipConstants.DIGSIG;
-		allSigs[5] = InternalZipConstants.ARCEXTDATREC;
-		allSigs[6] = InternalZipConstants.SPLITSIG;
-		allSigs[7] = InternalZipConstants.ZIP64ENDCENDIRLOC;
-		allSigs[8] = InternalZipConstants.ZIP64ENDCENDIRREC;
-		allSigs[9] = InternalZipConstants.EXTRAFIELDZIP64LENGTH;
-		allSigs[10] = InternalZipConstants.AESSIG;
-		
-		return allSigs;
-	}
 }

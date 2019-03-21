@@ -30,11 +30,11 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class MacBasedPRF implements PRF
 {
-    protected Mac mac;
+  private Mac mac;
 
-    protected int hLen;
+  private int hLen;
 
-    protected String macAlgorithm;
+  private String macAlgorithm;
 
     public MacBasedPRF(String macAlgorithm)
     {

@@ -16,77 +16,8 @@
 
 package net.lingala.zip4j.util;
 
-import java.io.DataInput;
-import java.io.IOException;
-
 public class Raw
 {
-	public static long readLongLittleEndian(byte[] array,int pos){
-		long temp = 0;
-		temp |= array[pos+7]&0xff;
-		temp <<=8;
-		temp |= array[pos+6]&0xff;
-		temp <<=8;
-		temp |= array[pos+5]&0xff;
-		temp <<=8;
-		temp |= array[pos+4]&0xff;
-		temp <<=8;
-		temp |= array[pos+3]&0xff;
-		temp <<=8;
-		temp |= array[pos+2]&0xff;
-		temp <<=8;
-		temp |= array[pos+1]&0xff;
-		temp <<=8;
-		temp |= array[pos]&0xff;
-		return temp;
-	}
-	
-	public static int readLeInt(DataInput di, byte[] b) {
-		try {
-			di.readFully(b, 0, 4);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	    return ((b[0] & 0xff) | (b[1] & 0xff) << 8)
-		    | ((b[2] & 0xff) | (b[3] & 0xff) << 8) << 16;
-	}
-
-	public static int readShortLittleEndian(byte[] b, int off){
-	    return (b[off] & 0xff) | (b[off+1] & 0xff) << 8;
-	}
-	
-	public static final short readShortBigEndian(byte[] array, int pos) {
-		short temp = 0;
-		temp |= array[pos] & 0xff;
-		temp <<= 8;
-		temp |= array[pos + 1] & 0xff;
-		return temp;
-	}
-
-	public static int readIntLittleEndian(byte[] b, int off){
-	    return ((b[off] & 0xff) | (b[off+1] & 0xff) << 8)
-		    | ((b[off+2] & 0xff) | (b[off+3] & 0xff) << 8) << 16;
-	}
-	
-	public static byte[] toByteArray(int in,int outSize) {
-		byte[] out = new byte[outSize];
-		byte[] intArray = toByteArray(in);
-		for( int i=0; i<intArray.length && i<outSize; i++ ) {
-			out[i] = intArray[i];
-		}
-		return out;
-	}
-	
-	public static byte[] toByteArray(int in) {
-		byte[] out = new byte[4];
-
-		out[0] = (byte)in;
-		out[1] = (byte)(in >> 8);
-		out[2] = (byte)(in >> 16);
-		out[3] = (byte)(in >> 24);
-
-		return out;
-	}
 	
 	public static final void writeShortLittleEndian(byte[] array, int pos,
 			short value) {

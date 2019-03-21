@@ -21,15 +21,15 @@ package net.lingala.zip4j.crypto.PBKDF2;
  */
 public class PBKDF2Parameters
 {
-    protected byte[] salt;
+    private byte[] salt;
 
-    protected int iterationCount;
+    private int iterationCount;
 
-    protected String hashAlgorithm;
+    private String hashAlgorithm;
 
-    protected String hashCharset;
+    private String hashCharset;
 
-    protected byte[] derivedKey;
+    private byte[] derivedKey;
 
     public PBKDF2Parameters()
     {

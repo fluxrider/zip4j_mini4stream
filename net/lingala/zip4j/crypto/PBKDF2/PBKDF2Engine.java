@@ -25,9 +25,9 @@ import net.lingala.zip4j.util.Raw;
 
 public class PBKDF2Engine
 {
-    protected PBKDF2Parameters parameters;
+  private PBKDF2Parameters parameters;
 
-    protected PRF prf;
+  private PRF prf;
 
     public PBKDF2Engine()
     {
@@ -96,7 +96,7 @@ public class PBKDF2Engine
         return true;
     }
 
-    protected void assertPRF(byte[] P)
+    private void assertPRF(byte[] P)
     {
         if (prf == null)
         {
@@ -110,7 +110,7 @@ public class PBKDF2Engine
         return prf;
     }
 
-    protected static byte[] PBKDF2(PRF prf, byte[] S, int c, int dkLen)
+    private static byte[] PBKDF2(PRF prf, byte[] S, int c, int dkLen)
     {
         if (S == null)
         {
@@ -136,7 +136,7 @@ public class PBKDF2Engine
         return T;
     }
 
-    protected static int ceil(int a, int b)
+    private static int ceil(int a, int b)
     {
         int m = 0;
         if (a % b > 0)
@@ -146,7 +146,7 @@ public class PBKDF2Engine
         return a / b + m;
     }
 
-    protected static void _F(byte[] dest, int offset, PRF prf, byte[] S, int c,
+    private static void _F(byte[] dest, int offset, PRF prf, byte[] S, int c,
             int blockIndex)
     {
         int hLen = prf.getHLen();
@@ -165,7 +165,7 @@ public class PBKDF2Engine
         System.arraycopy(U_r, 0, dest, offset, hLen);
     }
 
-    protected static void xor(byte[] dest, byte[] src)
+    private static void xor(byte[] dest, byte[] src)
     {
         for (int i = 0; i < dest.length; i++)
         {
@@ -173,7 +173,7 @@ public class PBKDF2Engine
         }
     }
 
-    protected static void INT(byte[] dest, int offset, int i)
+    private static void INT(byte[] dest, int offset, int i)
     {
         dest[offset + 0] = (byte) (i / (256 * 256 * 256));
         dest[offset + 1] = (byte) (i / (256 * 256));

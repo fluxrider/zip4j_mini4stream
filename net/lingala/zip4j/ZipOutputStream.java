@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import net.lingala.zip4j.util.HeaderWriter;
-import net.lingala.zip4j.crypto.AESEncrpyter;
+import net.lingala.zip4j.crypto.AESEncrypter;
 import net.lingala.zip4j.crypto.IEncrypter;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.CentralDirectory;
@@ -38,20 +38,20 @@ import net.lingala.zip4j.util.Zip4jUtil;
 
 public class ZipOutputStream extends OutputStream {
 	
-	protected OutputStream outputStream;
-	protected FileHeader fileHeader;
-	protected LocalFileHeader localFileHeader;
+  private OutputStream outputStream;
+  private FileHeader fileHeader;
+  private LocalFileHeader localFileHeader;
 	private IEncrypter encrypter;
-	protected ZipParameters zipParameters;
-	protected ZipModel zipModel;
+	private ZipParameters zipParameters;
+	private ZipModel zipModel;
 	private long totalBytesWritten;
-	protected CRC32 crc;
+	private CRC32 crc;
 	private long bytesWrittenForThisFile;
 	private byte[] pendingBuffer;
 	private int pendingBufferLength;
 	private long totalBytesRead;
 	private byte[] buff;
-	protected Deflater deflater;
+	private Deflater deflater;
 	private boolean firstBytesRead;
 
 	public ZipOutputStream(OutputStream outputStream, ZipParameters zipParameters) {
@@ -74,7 +74,7 @@ public class ZipOutputStream extends OutputStream {
 		putNextEntry(params);
 	}
 	
-	protected void putNextEntry(ZipParameters zipParameters) {
+	private void putNextEntry(ZipParameters zipParameters) {
 		try {
 			this.zipParameters = (ZipParameters)zipParameters.clone();
 			
@@ -108,8 +108,8 @@ public class ZipOutputStream extends OutputStream {
 			if (this.zipParameters.isEncryptFiles()) {
 				initEncrypter();
 				if (encrypter != null) {
-					byte[] saltBytes = ((AESEncrpyter)encrypter).getSaltBytes();
-					byte[] passwordVerifier = ((AESEncrpyter)encrypter).getDerivedPasswordVerifier();
+					byte[] saltBytes = ((AESEncrypter)encrypter).getSaltBytes();
+					byte[] passwordVerifier = ((AESEncrypter)encrypter).getDerivedPasswordVerifier();
 					outputStream.write(saltBytes);
 					outputStream.write(passwordVerifier);
 					totalBytesWritten += saltBytes.length + passwordVerifier.length;
@@ -140,7 +140,7 @@ public class ZipOutputStream extends OutputStream {
 			return;
 		}
 		
-		encrypter = new AESEncrpyter(zipParameters.getPassword(), zipParameters.getAesKeyStrength());
+		encrypter = new AESEncrypter(zipParameters.getPassword(), zipParameters.getAesKeyStrength());
 	}
 	
 	private void initZipModel(ZipModel zipModel) {
@@ -225,7 +225,7 @@ public class ZipOutputStream extends OutputStream {
 		bytesWrittenForThisFile += len;
 	}
 	
-	protected void closeEntry() throws IOException {
+	private void closeEntry() throws IOException {
 		if (zipParameters.getCompressionMethod() == Zip4jConstants.COMP_DEFLATE) {
 			if (!deflater.finished()) {
 				deflater.finish();
@@ -242,8 +242,8 @@ public class ZipOutputStream extends OutputStream {
 		}
 		
 		if (this.zipParameters.isEncryptFiles()) {
-			if (encrypter instanceof AESEncrpyter) {
-				outputStream.write(((AESEncrpyter)encrypter).getFinalMac());
+			if (encrypter instanceof AESEncrypter) {
+				outputStream.write(((AESEncrypter)encrypter).getFinalMac());
 				bytesWrittenForThisFile += 10;
 				totalBytesWritten += 10;
 			} else {
@@ -412,7 +412,7 @@ public class ZipOutputStream extends OutputStream {
 		}
 	}
 	
-	protected void updateTotalBytesRead(int toUpdate) {
+	private void updateTotalBytesRead(int toUpdate) {
 		if (toUpdate > 0) {
 			totalBytesRead += toUpdate;
 		}

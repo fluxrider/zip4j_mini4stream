@@ -25,7 +25,7 @@ import net.lingala.zip4j.crypto.AESEngine;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
 
-public class AESEncrpyter implements IEncrypter {
+public class AESEncrypter implements IEncrypter {
 	
 	private char[] password;
 	private AESEngine aesEngine;
@@ -49,7 +49,7 @@ public class AESEncrpyter implements IEncrypter {
 	private byte[] iv;
 	private byte[] counterBlock;
 	
-	public AESEncrpyter(char[] password, int keyStrength) {
+	public AESEncrypter(char[] password, int keyStrength) {
 		if (password == null || password.length == 0) {
 			throw new RuntimeException("input password is empty or null in AES encrypter constructor");
 		}
