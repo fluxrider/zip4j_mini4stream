@@ -16,8 +16,6 @@
 
 package net.lingala.zip4j.model;
 
-import java.util.ArrayList;
-
 import net.lingala.zip4j.util.Zip4jUtil;
 
 public class FileHeader {
@@ -71,8 +69,6 @@ public class FileHeader {
 	private Zip64ExtendedInfo zip64ExtendedInfo;
 	
 	private AESExtraDataRecord aesExtraDataRecord;
-	
-	private ArrayList extraDataRecords;
 	
 	private boolean fileNameUTF8Encoded;
 	
@@ -256,14 +252,6 @@ public class FileHeader {
 
 	public void setCrcBuff(byte[] crcBuff) {
 		this.crcBuff = crcBuff;
-	}
-
-	public ArrayList getExtraDataRecords() {
-		return extraDataRecords;
-	}
-
-	public void setExtraDataRecords(ArrayList extraDataRecords) {
-		this.extraDataRecords = extraDataRecords;
 	}
 
 	public boolean isDataDescriptorExists() {

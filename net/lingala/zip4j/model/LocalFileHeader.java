@@ -16,8 +16,6 @@
 
 package net.lingala.zip4j.model;
 
-import java.util.ArrayList;
-
 public class LocalFileHeader {
 	
 	private int signature;
@@ -53,8 +51,6 @@ public class LocalFileHeader {
 	private int encryptionMethod;
 	
 	private char[] password;
-	
-	private ArrayList extraDataRecords;
 	
 	private Zip64ExtendedInfo zip64ExtendedInfo;
 	
@@ -207,14 +203,6 @@ public class LocalFileHeader {
 
 	public void setPassword(char[] password) {
 		this.password = password;
-	}
-
-	public ArrayList getExtraDataRecords() {
-		return extraDataRecords;
-	}
-
-	public void setExtraDataRecords(ArrayList extraDataRecords) {
-		this.extraDataRecords = extraDataRecords;
 	}
 
 	public boolean isDataDescriptorExists() {

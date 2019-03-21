@@ -20,8 +20,6 @@ import java.util.List;
 
 public class ZipModel implements Cloneable {
 	
-	private List dataDescriptorList;
-	
 	private ArchiveExtraDataRecord archiveExtraDataRecord;
 	
 	private CentralDirectory centralDirectory;
@@ -52,14 +50,6 @@ public class ZipModel implements Cloneable {
 		splitLength = -1;
 	}
 	
-	public List getDataDescriptorList() {
-		return dataDescriptorList;
-	}
-
-	public void setDataDescriptorList(List dataDescriptorList) {
-		this.dataDescriptorList = dataDescriptorList;
-	}
-
 	public CentralDirectory getCentralDirectory() {
 		return centralDirectory;
 	}

@@ -61,7 +61,7 @@ public class HeaderWriter {
 			copyByteArrayToArrayList(shortByte, byteArrayList);
 			//File modified time
 			int dateTime = localFileHeader.getLastModFileTime();
-			Raw.writeIntLittleEndian(intByte, 0, (int)dateTime);
+			Raw.writeIntLittleEndian(intByte, 0, dateTime);
 			copyByteArrayToArrayList(intByte, byteArrayList);
 			//Skip crc for now - this field will be updated after data is compressed
 			Raw.writeIntLittleEndian(intByte, 0, (int)localFileHeader.getCrc32());
@@ -350,7 +350,7 @@ public class HeaderWriter {
 		
 		int sizeOfCentralDir = 0;
 		for (int i = 0; i < zipModel.getCentralDirectory().getFileHeaders().size(); i++) {
-			FileHeader fileHeader = (FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(i);
+			FileHeader fileHeader = zipModel.getCentralDirectory().getFileHeaders().get(i);
 			int sizeOfFileHeader = writeFileHeader(zipModel, fileHeader, outputStream, headerBytesList);
 			sizeOfCentralDir += sizeOfFileHeader;
 		}
@@ -596,11 +596,11 @@ public class HeaderWriter {
 					zipModel.getCentralDirectory().getFileHeaders() != null &&
 					zipModel.getCentralDirectory().getFileHeaders().size() > 0) {
 				Raw.writeShortLittleEndian(shortByte, 0, 
-						(short)((FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(0)).getVersionMadeBy());
+						(short)zipModel.getCentralDirectory().getFileHeaders().get(0).getVersionMadeBy());
 				copyByteArrayToArrayList(shortByte, headerBytesList);
 				
 				Raw.writeShortLittleEndian(shortByte, 0, 
-						(short)((FileHeader)zipModel.getCentralDirectory().getFileHeaders().get(0)).getVersionNeededToExtract());
+(short)zipModel.getCentralDirectory().getFileHeaders().get(0).getVersionNeededToExtract());
 				copyByteArrayToArrayList(shortByte, headerBytesList);
 			} else {
 				copyByteArrayToArrayList(emptyShortByte, headerBytesList);
@@ -802,7 +802,7 @@ public class HeaderWriter {
 		
 		int noEntries = 0;
 		for (int i = 0; i < fileHeaders.size(); i++) {
-			FileHeader fileHeader = (FileHeader)fileHeaders.get(i);
+			FileHeader fileHeader = fileHeaders.get(i);
 			if (fileHeader.getDiskNumberStart() == numOfDisk) {
 				noEntries++;
 			}

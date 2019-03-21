@@ -1,2 +1,2 @@
 mkdir -p bin
-javac -cp . -d bin Example.java
+javac -cp . -d bin Example.java -Xlint

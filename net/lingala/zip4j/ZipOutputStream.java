@@ -362,7 +362,7 @@ public class ZipOutputStream extends OutputStream {
 		localFileHeader.setAesExtraDataRecord(fileHeader.getAesExtraDataRecord());
 		localFileHeader.setCrc32(fileHeader.getCrc32());
 		localFileHeader.setCompressedSize(fileHeader.getCompressedSize());
-		localFileHeader.setGeneralPurposeFlag((byte[])fileHeader.getGeneralPurposeFlag().clone());
+		localFileHeader.setGeneralPurposeFlag(fileHeader.getGeneralPurposeFlag().clone());
 	}
 	
 	private int[] generateGeneralPurposeBitArray(boolean isEncrpyted, int compressionMethod) {
