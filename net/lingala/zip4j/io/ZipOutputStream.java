@@ -179,6 +179,16 @@ public class ZipOutputStream extends OutputStream {
 		crc.update(b, off, len);
 		updateTotalBytesRead(len);
 		if (zipParameters.getCompressionMethod() != Zip4jConstants.COMP_DEFLATE) {
+			_write(b, off, len);
+		} else {
+			deflater.setInput(b, off, len);
+			while (!deflater.needsInput()) {
+				deflate();
+			}
+		}
+	}
+
+	public void _write(byte [] b, int off, int len) throws IOException {
 			if (len == 0) return;
 			
 			if (zipParameters.isEncryptFiles()) {
@@ -205,13 +215,6 @@ public class ZipOutputStream extends OutputStream {
 			}
 			if (len != 0)
 				encryptAndWrite(b, off, len);
-
-		} else {
-			deflater.setInput(b, off, len);
-			while (!deflater.needsInput()) {
-				deflate();
-			}
-		}		
 	}
 
 	private void encryptAndWrite(byte[] b, int off, int len) throws IOException {
@@ -429,10 +432,10 @@ public class ZipOutputStream extends OutputStream {
 				len -= 4;
 			}
 			if (!firstBytesRead) {
-				write(buff, 2, len - 2);
+				_write(buff, 2, len - 2);
 				firstBytesRead = true;
 			} else {
-				write(buff, 0, len);
+				_write(buff, 0, len);
 			}
 		}
 	}
