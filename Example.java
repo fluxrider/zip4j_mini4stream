@@ -26,7 +26,7 @@ lib4j_mini4stream is stripped down to:
 */
 
 import java.io.*;
-import net.lingala.zip4j.io.ZipOutputStream;
+import net.lingala.zip4j.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 

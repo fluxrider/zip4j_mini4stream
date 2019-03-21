@@ -14,7 +14,7 @@
 * limitations under the License. 
 */
 
-package net.lingala.zip4j.io;
+package net.lingala.zip4j;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
-import net.lingala.zip4j.core.HeaderWriter;
+import net.lingala.zip4j.HeaderWriter;
 import net.lingala.zip4j.crypto.AESEncrpyter;
 import net.lingala.zip4j.crypto.IEncrypter;
 import net.lingala.zip4j.model.AESExtraDataRecord;

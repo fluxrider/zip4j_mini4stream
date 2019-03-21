@@ -21,7 +21,7 @@ import java.util.Random;
 import net.lingala.zip4j.crypto.PBKDF2.MacBasedPRF;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Engine;
 import net.lingala.zip4j.crypto.PBKDF2.PBKDF2Parameters;
-import net.lingala.zip4j.crypto.engine.AESEngine;
+import net.lingala.zip4j.crypto.AESEngine;
 import net.lingala.zip4j.util.InternalZipConstants;
 import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jConstants;
