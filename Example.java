@@ -19,11 +19,9 @@ Much like the original zip4j library, ZipOutputStream can be used to
 create zip files "on the fly" with all compression and encryption being
 done in memory.
 
-lib4j_mini4stream adds a functionality akin to ZipFile.addStream() to ZipOutputStream.
-
 lib4j_mini4stream is stripped down to:
 - ZipOutputStream only (no ZipFile).
-- only a single file in the zip, no directories.
+- only a single file from a stream in the zip, no directories.
 - no unzipping.
 */
 
@@ -42,7 +40,6 @@ public class Example {
     params.setPassword("my_password_goes_here");
     params.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
     params.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
-    // TODO try MAXIMUM/ULTRA
     params.setFileNameInZip("test.txt");
     params.setSourceExternalStream(true);
 
