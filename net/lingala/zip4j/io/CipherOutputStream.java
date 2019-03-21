@@ -39,7 +39,7 @@ import net.lingala.zip4j.util.Raw;
 import net.lingala.zip4j.util.Zip4jConstants;
 import net.lingala.zip4j.util.Zip4jUtil;
 
-public class CipherOutputStream extends BaseOutputStream {
+public class CipherOutputStream extends OutputStream {
 	
 	protected OutputStream outputStream;
 	protected FileHeader fileHeader;
