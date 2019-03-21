@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.io.SplitOutputStream;
 import net.lingala.zip4j.model.AESExtraDataRecord;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.LocalFileHeader;
@@ -117,7 +116,7 @@ public class HeaderWriter {
 			
 			//Zip64 should be the first extra data record that should be written
 			//This is NOT according to any specification but if this is changed
-			//then take care of updateLocalFileHeader for compressed size 
+			//then take care for compressed size 
 			if (writingZip64Rec) {
 				
 				
@@ -235,13 +234,8 @@ public class HeaderWriter {
 				}
 				
 				zipModel.getZip64EndCentralDirLocator().setOffsetZip64EndOfCentralDirRec(offsetCentralDir + sizeOfCentralDir);
-				if (outputStream instanceof SplitOutputStream) {
-					zipModel.getZip64EndCentralDirLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(((SplitOutputStream)outputStream).getCurrSplitFileCounter());
-					zipModel.getZip64EndCentralDirLocator().setTotNumberOfDiscs(((SplitOutputStream)outputStream).getCurrSplitFileCounter() + 1);
-				} else {
-					zipModel.getZip64EndCentralDirLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
-					zipModel.getZip64EndCentralDirLocator().setTotNumberOfDiscs(1);
-				}
+				zipModel.getZip64EndCentralDirLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(0);
+				zipModel.getZip64EndCentralDirLocator().setTotNumberOfDiscs(1);
 				
 				writeZip64EndOfCentralDirectoryRecord(zipModel, outputStream, sizeOfCentralDir, offsetCentralDir, headerBytesList);
 				
@@ -316,13 +310,6 @@ public class HeaderWriter {
 		}
 		
 		try {
-			if (outputStream instanceof SplitOutputStream) {
-				if (((SplitOutputStream)outputStream).checkBuffSizeAndStartNextSplitFile(buff.length)) {
-					finalizeZipFile(zipModel, outputStream);
-					return;
-				}
-			}
-			
 			outputStream.write(buff);
 		} catch (IOException e) {
 			throw new ZipException(e);
@@ -335,32 +322,22 @@ public class HeaderWriter {
 	 * @param outputStream
 	 * @throws ZipException
 	 */
-	private void processHeaderData(ZipModel zipModel, OutputStream outputStream) throws ZipException {
-		try {
-			int currSplitFileCounter = 0;
-			if (outputStream instanceof SplitOutputStream) {
-				zipModel.getEndCentralDirRecord().setOffsetOfStartOfCentralDir(
-						((SplitOutputStream)outputStream).getFilePointer());
-				currSplitFileCounter = ((SplitOutputStream)outputStream).getCurrSplitFileCounter();
-				
+	private void processHeaderData(ZipModel zipModel, OutputStream outputStream) {
+		int currSplitFileCounter = 0;
+		
+		if (zipModel.isZip64Format()) {
+			if (zipModel.getZip64EndCentralDirRecord() == null) {
+				zipModel.setZip64EndCentralDirRecord(new Zip64EndCentralDirRecord());
+			}
+			if (zipModel.getZip64EndCentralDirLocator() == null) {
+				zipModel.setZip64EndCentralDirLocator(new Zip64EndCentralDirLocator());
 			}
 			
-			if (zipModel.isZip64Format()) {
-				if (zipModel.getZip64EndCentralDirRecord() == null) {
-					zipModel.setZip64EndCentralDirRecord(new Zip64EndCentralDirRecord());
-				}
-				if (zipModel.getZip64EndCentralDirLocator() == null) {
-					zipModel.setZip64EndCentralDirLocator(new Zip64EndCentralDirLocator());
-				}
-				
-				zipModel.getZip64EndCentralDirLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(currSplitFileCounter);
-				zipModel.getZip64EndCentralDirLocator().setTotNumberOfDiscs(currSplitFileCounter + 1);
-			}
-			zipModel.getEndCentralDirRecord().setNoOfThisDisk(currSplitFileCounter);
-			zipModel.getEndCentralDirRecord().setNoOfThisDiskStartOfCentralDir(currSplitFileCounter);
-		} catch (IOException e) {
-			throw new ZipException(e);
+			zipModel.getZip64EndCentralDirLocator().setNoOfDiskStartOfZip64EndOfCentralDirRec(currSplitFileCounter);
+			zipModel.getZip64EndCentralDirLocator().setTotNumberOfDiscs(currSplitFileCounter + 1);
 		}
+		zipModel.getEndCentralDirRecord().setNoOfThisDisk(currSplitFileCounter);
+		zipModel.getEndCentralDirRecord().setNoOfThisDiskStartOfCentralDir(currSplitFileCounter);
 	}
 	
 	/**
@@ -803,97 +780,6 @@ public class HeaderWriter {
 		} catch (Exception e) {
 			throw new ZipException(e);
 		}
-	}
-	
-	public void updateLocalFileHeader(LocalFileHeader localFileHeader, long offset, 
-			int toUpdate, ZipModel zipModel, byte[] bytesToWrite, int noOfDisk, SplitOutputStream outputStream) throws ZipException {
-		if (localFileHeader == null || offset < 0 || zipModel == null) {
-			throw new ZipException("invalid input parameters, cannot update local file header");
-		}
-		
-		try {
-			boolean closeFlag = false;
-			SplitOutputStream currOutputStream = null;
-			
-			if (noOfDisk != outputStream.getCurrSplitFileCounter()) {
-				File zipFile = new File(zipModel.getZipFile());
-				String parentFile = zipFile.getParent();
-				String fileNameWithoutExt = Zip4jUtil.getZipFileNameWithoutExt(zipFile.getName());
-				String fileName = parentFile + System.getProperty("file.separator");
-				if (noOfDisk < 9) {
-					fileName += fileNameWithoutExt + ".z0" + (noOfDisk + 1);
-				} else {
-					fileName += fileNameWithoutExt + ".z" + (noOfDisk + 1);
-				}
-				currOutputStream = new SplitOutputStream(new File(fileName));
-				closeFlag = true;
-			} else {
-				currOutputStream = outputStream;
-			}
-			
-			long currOffset = currOutputStream.getFilePointer();
-			
-			switch (toUpdate) {
-			case InternalZipConstants.UPDATE_LFH_CRC:
-				currOutputStream.seek(offset + toUpdate);
-				currOutputStream.write(bytesToWrite);
-				break;
-			case InternalZipConstants.UPDATE_LFH_COMP_SIZE:
-			case InternalZipConstants.UPDATE_LFH_UNCOMP_SIZE:
-				updateCompressedSizeInLocalFileHeader(currOutputStream, localFileHeader, 
-						offset, toUpdate, bytesToWrite, zipModel.isZip64Format());
-				break;
-			default:
-				break;
-			}
-			if (closeFlag) {
-				currOutputStream.close();
-			} else {
-				outputStream.seek(currOffset);
-			}
-			
-		} catch (Exception e) {
-			throw new ZipException(e);
-		}
-	}
-	
-	private void updateCompressedSizeInLocalFileHeader(SplitOutputStream outputStream, LocalFileHeader localFileHeader, 
-			long offset, long toUpdate, byte[] bytesToWrite, boolean isZip64Format) throws ZipException {
-		
-		if (outputStream == null) {
-			throw new ZipException("invalid output stream, cannot update compressed size for local file header");
-		}
-		
-		try {
-			if (localFileHeader.isWriteComprSizeInZip64ExtraRecord()) {
-				if (bytesToWrite.length != 8) {
-					throw new ZipException("attempting to write a non 8-byte compressed size block for a zip64 file");
-				}
-				
-				//4 - compressed size
-				//4 - uncomprssed size
-				//2 - file name length
-				//2 - extra field length
-				//file name length
-				//2 - Zip64 signature
-				//2 - size of zip64 data
-				//8 - crc
-				//8 - compressed size
-				//8 - uncompressed size
-				long zip64CompressedSizeOffset = offset + toUpdate + 4 + 4 + 2 + 2 + localFileHeader.getFileNameLength() + 2 + 2 + 8;
-				if (toUpdate == InternalZipConstants.UPDATE_LFH_UNCOMP_SIZE) {
-					zip64CompressedSizeOffset += 8;
-				}
-				outputStream.seek(zip64CompressedSizeOffset);
-				outputStream.write(bytesToWrite);
-			} else {
-				outputStream.seek(offset + toUpdate);
-				outputStream.write(bytesToWrite);
-			}
-		} catch (IOException e) {
-			throw new ZipException(e);
-		}
-		
 	}
 	
 	private void copyByteArrayToArrayList(byte[] byteArray, List arrayList) throws ZipException {

@@ -87,18 +87,10 @@ public class CipherOutputStream extends BaseOutputStream {
 				}
 			}
 			
-			if (this.outputStream instanceof SplitOutputStream) {
-				if (totalBytesWritten == 4) {
-					fileHeader.setOffsetLocalHeader(4);
-				} else {
-					fileHeader.setOffsetLocalHeader(((SplitOutputStream)outputStream).getFilePointer());
-				}
+			if (totalBytesWritten == 4) {
+				fileHeader.setOffsetLocalHeader(4);
 			} else {
-				if (totalBytesWritten == 4) {
-					fileHeader.setOffsetLocalHeader(4);
-				} else {
-					fileHeader.setOffsetLocalHeader(totalBytesWritten);
-				}
+				fileHeader.setOffsetLocalHeader(totalBytesWritten);
 			}
 			
 			HeaderWriter headerWriter = new HeaderWriter();
@@ -170,13 +162,6 @@ public class CipherOutputStream extends BaseOutputStream {
 		
 		if (this.zipModel.getLocalFileHeaderList() == null)
 			this.zipModel.setLocalFileHeaderList(new ArrayList());
-		
-		if (this.outputStream instanceof SplitOutputStream) {
-			if (((SplitOutputStream)outputStream).isSplitZipFile()) {
-				this.zipModel.setSplitArchive(true);
-				this.zipModel.setSplitLength(((SplitOutputStream)outputStream).getSplitLength());
-			}
-		}
 		
 		this.zipModel.getEndCentralDirRecord().setSignature(InternalZipConstants.ENDSIG);
 	}
@@ -340,11 +325,7 @@ public class CipherOutputStream extends BaseOutputStream {
 			fileHeader.setFileNameLength(Zip4jUtil.getEncodedStringLength(fileName));
 		}
 		
-		if (outputStream instanceof SplitOutputStream) {
-			fileHeader.setDiskNumberStart(((SplitOutputStream)outputStream).getCurrSplitFileCounter());
-		} else {
-			fileHeader.setDiskNumberStart(0);
-		}
+		fileHeader.setDiskNumberStart(0);
 		
 		if (zipParameters.isEncryptFiles() && 
 				zipParameters.getEncryptionMethod() == Zip4jConstants.ENC_METHOD_STANDARD) {
