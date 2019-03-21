@@ -55,10 +55,6 @@ public class DeflaterOutputStream extends CipherOutputStream {
 		}
 	}
 
-	public void write(byte[] b) throws IOException {
-		write(b, 0, b.length);
-	}
-	
 	private void deflate () throws IOException {
 		int len = deflater.deflate(buff, 0, buff.length);
 		if (len > 0) {
@@ -77,12 +73,6 @@ public class DeflaterOutputStream extends CipherOutputStream {
 				super.write(buff, 0, len);
 			}
 		}
-	}
-	
-	public void write(int bval) throws IOException {
-	    byte[] b = new byte[1];
-	    b[0] = (byte) bval;
-	    write(b, 0, 1);
 	}
 	
 	public void write(byte[] buf, int off, int len) throws IOException {

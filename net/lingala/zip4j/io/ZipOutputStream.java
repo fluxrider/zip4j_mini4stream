@@ -15,16 +15,6 @@ public class ZipOutputStream extends DeflaterOutputStream {
 		super(outputStream, zipModel);
 	}
 	
-	public void write(int bval) throws IOException {
-		byte[] b = new byte[1];
-		b[0] = (byte) bval;
-		write(b, 0, 1);
-	}
-	
-	public void write(byte[] b) throws IOException {
-		write(b, 0, b.length);
-	}
-	
 	public void write(byte[] b, int off, int len) throws IOException {
 		crc.update(b, off, len);
 		updateTotalBytesRead(len);

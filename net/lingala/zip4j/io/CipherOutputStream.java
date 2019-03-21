@@ -173,9 +173,6 @@ public class CipherOutputStream extends OutputStream {
 	}
 	
 	public void write(byte[] b) throws IOException {
-		if (b == null)
-			throw new NullPointerException();
-		
 		if (b.length == 0) return;
 		
 		write(b, 0, b.length);
