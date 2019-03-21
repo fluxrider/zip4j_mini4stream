@@ -43,7 +43,7 @@ public class HeaderWriter {
 		}
 		
 		try {
-			ArrayList byteArrayList = new ArrayList();
+			ArrayList<String> byteArrayList = new ArrayList<>();
 			
 			byte[] shortByte = new byte[2];
 			byte[] intByte = new byte[4];
@@ -169,7 +169,7 @@ public class HeaderWriter {
 			throw new RuntimeException("input parameters is null, cannot write extended local header");
 		}
 		
-		ArrayList byteArrayList = new ArrayList();
+		ArrayList<String> byteArrayList = new ArrayList<>();
 		byte[] intByte = new byte[4];
 		
 		//Extended local file header signature
@@ -217,7 +217,7 @@ public class HeaderWriter {
 			
 			long offsetCentralDir = zipModel.getEndCentralDirRecord().getOffsetOfStartOfCentralDir();
 			
-			List headerBytesList = new ArrayList();
+			List<String> headerBytesList = new ArrayList<>();
 			
 			int sizeOfCentralDir = writeCentralDirectory(zipModel, outputStream, headerBytesList);
 			
@@ -261,7 +261,7 @@ public class HeaderWriter {
 		
 		try {
 		
-			List headerBytesList = new ArrayList();
+			List<String> headerBytesList = new ArrayList<>();
 			
 			long offsetCentralDir = zipModel.getEndCentralDirRecord().getOffsetOfStartOfCentralDir();
 			
@@ -337,7 +337,7 @@ public class HeaderWriter {
 	 * @return size of central directory
 	 */
 	private int writeCentralDirectory(ZipModel zipModel, 
-			OutputStream outputStream, List headerBytesList) {
+			OutputStream outputStream, List<String> headerBytesList) {
 		if (zipModel == null || outputStream == null) {
 			throw new RuntimeException("input parameters is null, cannot write central directory");
 		}
@@ -358,7 +358,7 @@ public class HeaderWriter {
 	}
 	
 	private int writeFileHeader(ZipModel zipModel, FileHeader fileHeader, 
-			OutputStream outputStream, List headerBytesList) {
+			OutputStream outputStream, List<String> headerBytesList) {
 		
 		if (fileHeader == null || outputStream == null) {
 			throw new RuntimeException("input parameters is null, cannot write local file header");
@@ -570,7 +570,7 @@ public class HeaderWriter {
 	
 	private void writeZip64EndOfCentralDirectoryRecord(ZipModel zipModel, 
 			OutputStream outputStream, int sizeOfCentralDir, 
-			long offsetCentralDir, List headerBytesList) {
+			long offsetCentralDir, List<String> headerBytesList) {
 		if (zipModel == null || outputStream == null) {
 			throw new RuntimeException("zip model or output stream is null, cannot write zip64 end of central directory record");
 		}
@@ -652,7 +652,7 @@ public class HeaderWriter {
 	}
 	
 	private void writeZip64EndOfCentralDirectoryLocator(ZipModel zipModel, 
-			OutputStream outputStream, List headerBytesList) {
+			OutputStream outputStream, List<String> headerBytesList) {
 		if (zipModel == null || outputStream == null) {
 			throw new RuntimeException("zip model or output stream is null, cannot write zip64 end of central directory locator");
 		}
@@ -686,7 +686,7 @@ public class HeaderWriter {
 			OutputStream outputStream, 
 			int sizeOfCentralDir, 
 			long offsetCentralDir,
-			List headrBytesList) {
+			List<String> headrBytesList) {
 		if (zipModel == null || outputStream == null) {
 			throw new RuntimeException("zip model or output stream is null, cannot write end of central directory record");
 		}
@@ -766,7 +766,7 @@ public class HeaderWriter {
 		}
 	}
 	
-	private void copyByteArrayToArrayList(byte[] byteArray, List arrayList) {
+	private void copyByteArrayToArrayList(byte[] byteArray, List<String> arrayList) {
 		if (arrayList == null || byteArray == null) {
 			throw new RuntimeException("one of the input parameters is null, cannot copy byte array to array list");
 		}
@@ -776,7 +776,7 @@ public class HeaderWriter {
 		}
 	}
 	
-	private byte[] byteArrayListToByteArray(List arrayList) {
+	private byte[] byteArrayListToByteArray(List<String> arrayList) {
 		if (arrayList == null) {
 			throw new RuntimeException("input byte array list is null, cannot conver to byte array");
 		}
@@ -788,13 +788,13 @@ public class HeaderWriter {
 		byte[] retBytes = new byte[arrayList.size()];
 		
 		for (int i = 0; i < arrayList.size(); i++) {
-			retBytes[i] = Byte.parseByte((String)arrayList.get(i));
+			retBytes[i] = Byte.parseByte(arrayList.get(i));
 		}
 		
 		return retBytes;
 	}
 	
-	private int countNumberOfFileHeaderEntriesOnDisk(ArrayList fileHeaders, 
+	private int countNumberOfFileHeaderEntriesOnDisk(ArrayList<FileHeader> fileHeaders, 
 			int numOfDisk) {
 		if (fileHeaders == null) {
 			throw new RuntimeException("file headers are null, cannot calculate number of entries on this disk");

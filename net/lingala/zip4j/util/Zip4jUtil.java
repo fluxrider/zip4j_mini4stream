@@ -320,35 +320,6 @@ public class Zip4jUtil {
 		return -1;
 	}
 	
-	public static ArrayList getFilesInDirectoryRec(File path, 
-			boolean readHiddenFiles) {
-		
-		if (path == null) {
-			throw new RuntimeException("input path is null, cannot read files in the directory");
-		}
-		
-		ArrayList result = new ArrayList();
-		File[] filesAndDirs = path.listFiles();
-		List filesDirs = Arrays.asList(filesAndDirs);
-		
-		if (!path.canRead()) {
-			return result; 
-		}
-		
-		for(int i = 0; i < filesDirs.size(); i++) {
-			File file = (File)filesDirs.get(i);
-			if (file.isHidden() && !readHiddenFiles) {
-				return result;
-			}
-			result.add(file);
-			if (file.isDirectory()) {
-				List deeperList = getFilesInDirectoryRec(file, readHiddenFiles);
-				result.addAll(deeperList);
-			}
-	    }
-		return result;
-	}
-	
 	public static String getZipFileNameWithoutExt(String zipFile) {
 		if (!isStringNotNullAndNotEmpty(zipFile)) {
 			throw new RuntimeException("zip file name is empty or null, cannot determine zip file name");
@@ -579,51 +550,6 @@ public class Zip4jUtil {
 		}
 	}
 	
-	public static ArrayList getSplitZipFiles(ZipModel zipModel) {
-		if (zipModel == null) {
-			throw new RuntimeException("cannot get split zip files: zipmodel is null");
-		}
-		
-		if (zipModel.getEndCentralDirRecord() == null) {
-			return null;
-		}
-		
-		ArrayList retList = new ArrayList();
-		String currZipFile = zipModel.getZipFile();
-		String zipFileName = (new File(currZipFile)).getName();
-		String partFile = null;
-		
-		if (!isStringNotNullAndNotEmpty(currZipFile)) {
-			throw new RuntimeException("cannot get split zip files: zipfile is null");
-		}
-		
-		if (!zipModel.isSplitArchive()) {
-			retList.add(currZipFile);
-			return retList;
-		}
-		
-		int numberOfThisDisk = zipModel.getEndCentralDirRecord().getNoOfThisDisk();
-		
-		if (numberOfThisDisk == 0) {
-			retList.add(currZipFile);
-			return retList;
-		} else {
-			for (int i = 0; i <= numberOfThisDisk; i++) {
-				if (i == numberOfThisDisk) {
-					retList.add(zipModel.getZipFile());
-				} else {
-					String fileExt = ".z0";
-					if (i > 9) {
-						fileExt = ".z";
-					}
-					partFile = (zipFileName.indexOf(".") >= 0) ? currZipFile.substring(0, currZipFile.lastIndexOf(".")) : currZipFile;
-					partFile = partFile + fileExt + (i + 1);
-					retList.add(partFile);
-				}
-			}
-		}
-		return retList;
-	}
 	
 	public static String getRelativeFileName(String file, String rootFolderInZip, String rootFolderPath) {
 		if (!Zip4jUtil.isStringNotNullAndNotEmpty(file)) {

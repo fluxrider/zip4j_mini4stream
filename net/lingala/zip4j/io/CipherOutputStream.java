@@ -155,10 +155,7 @@ public abstract class CipherOutputStream extends OutputStream {
 			this.zipModel.setCentralDirectory(new CentralDirectory());
 		
 		if (this.zipModel.getCentralDirectory().getFileHeaders() == null)
-			this.zipModel.getCentralDirectory().setFileHeaders(new ArrayList());
-		
-		if (this.zipModel.getLocalFileHeaderList() == null)
-			this.zipModel.setLocalFileHeaderList(new ArrayList());
+			this.zipModel.getCentralDirectory().setFileHeaders(new ArrayList<FileHeader>());
 		
 		this.zipModel.getEndCentralDirRecord().setSignature(InternalZipConstants.ENDSIG);
 	}
@@ -255,7 +252,6 @@ public abstract class CipherOutputStream extends OutputStream {
 			localFileHeader.setCrc32(crc32);
 		}
 		
-		zipModel.getLocalFileHeaderList().add(localFileHeader);
 		zipModel.getCentralDirectory().getFileHeaders().add(fileHeader);
 		
 		HeaderWriter headerWriter = new HeaderWriter();

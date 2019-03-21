@@ -20,8 +20,6 @@ import java.util.List;
 
 public class ZipModel implements Cloneable {
 	
-	private List localFileHeaderList;
-	
 	private List dataDescriptorList;
 	
 	private ArchiveExtraDataRecord archiveExtraDataRecord;
@@ -54,14 +52,6 @@ public class ZipModel implements Cloneable {
 		splitLength = -1;
 	}
 	
-	public List getLocalFileHeaderList() {
-		return localFileHeaderList;
-	}
-
-	public void setLocalFileHeaderList(List localFileHeaderList) {
-		this.localFileHeaderList = localFileHeaderList;
-	}
-
 	public List getDataDescriptorList() {
 		return dataDescriptorList;
 	}

@@ -20,15 +20,15 @@ import java.util.ArrayList;
 
 public class CentralDirectory {
 	
-	private ArrayList fileHeaders;
+	private ArrayList<FileHeader> fileHeaders;
 	
 	private DigitalSignature digitalSignature;
 
-	public ArrayList getFileHeaders() {
+	public ArrayList<FileHeader> getFileHeaders() {
 		return fileHeaders;
 	}
 
-	public void setFileHeaders(ArrayList fileHeaders) {
+	public void setFileHeaders(ArrayList<FileHeader> fileHeaders) {
 		this.fileHeaders = fileHeaders;
 	}
 
