@@ -41,6 +41,7 @@ public class ZipParameters implements Cloneable {
 	
 	public ZipParameters() {
 		compressionMethod = Zip4jConstants.COMP_DEFLATE;
+		compressionLevel = Zip4jConstants.DEFLATE_LEVEL_NORMAL;
 		encryptFiles = false;
 		readHiddenFiles = true;
 		encryptionMethod = Zip4jConstants.ENC_NO_ENCRYPTION;

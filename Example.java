@@ -28,7 +28,6 @@ lib4j_mini4stream is stripped down to:
 import java.io.*;
 import net.lingala.zip4j.ZipOutputStream;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 public class Example {
 
@@ -36,8 +35,6 @@ public class Example {
     ZipParameters params = new ZipParameters();
     params.setEncryptFiles(true);
     params.setPassword("my_password_goes_here");
-    params.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
-    params.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
     params.setFileNameInZip("test.txt");
 
     ZipOutputStream out = new ZipOutputStream(new FileOutputStream("example.zip"), params);
