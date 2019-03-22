@@ -39,6 +39,7 @@ public class Example {
     ZipOutputStream out = new ZipOutputStream(new FileOutputStream("example.zip"), params);
     out.write("Hello".getBytes());
     out.close();
+    System.out.println(out.out_length);
   }
 
 }

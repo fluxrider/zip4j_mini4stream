@@ -53,6 +53,7 @@ public class ZipOutputStream extends OutputStream {
 	private byte[] buff;
 	private Deflater deflater;
 	private boolean firstBytesRead;
+	public long out_length;
 
 	public ZipOutputStream(OutputStream outputStream, ZipParameters zipParameters) {
 		this(outputStream, null, zipParameters);
@@ -282,6 +283,7 @@ public class ZipOutputStream extends OutputStream {
 		
 		HeaderWriter headerWriter = new HeaderWriter();
 		headerWriter.finalizeZipFile(zipModel, outputStream);
+		out_length = headerWriter.out_length + totalBytesWritten;
 	}
 	
 	public void close() throws IOException {

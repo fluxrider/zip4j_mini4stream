@@ -33,7 +33,8 @@ import net.lingala.zip4j.util.Zip4jUtil;
 
 public class HeaderWriter {
 	
-	private final int ZIP64_EXTRA_BUF = 50; 
+	private final int ZIP64_EXTRA_BUF = 50;
+  public long out_length;
 	
 	public int writeLocalFileHeader(ZipModel zipModel, LocalFileHeader localFileHeader, 
 			OutputStream outputStream) {
@@ -239,7 +240,7 @@ public class HeaderWriter {
 			
 			writeEndOfCentralDirectoryRecord(zipModel, outputStream, sizeOfCentralDir, offsetCentralDir, headerBytesList);
 			
-			writeZipHeaderBytes(zipModel, outputStream, byteArrayListToByteArray(headerBytesList));
+			out_length += writeZipHeaderBytes(zipModel, outputStream, byteArrayListToByteArray(headerBytesList));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -282,7 +283,7 @@ public class HeaderWriter {
 			
 			writeEndOfCentralDirectoryRecord(zipModel, outputStream, sizeOfCentralDir, offsetCentralDir, headerBytesList);
 			
-			writeZipHeaderBytes(zipModel, outputStream, byteArrayListToByteArray(headerBytesList));
+			out_length += writeZipHeaderBytes(zipModel, outputStream, byteArrayListToByteArray(headerBytesList));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -293,13 +294,14 @@ public class HeaderWriter {
 	 * @param outputStream
 	 * @param buff
 	 */
-	private static void writeZipHeaderBytes(ZipModel zipModel, OutputStream outputStream, byte[] buff) {
+	private static long writeZipHeaderBytes(ZipModel zipModel, OutputStream outputStream, byte[] buff) {
 		if (buff == null) {
 			throw new RuntimeException("invalid buff to write as zip headers");
 		}
 		
 		try {
 			outputStream.write(buff);
+			return buff.length;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
